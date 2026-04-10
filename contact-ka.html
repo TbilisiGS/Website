@@ -76,7 +76,7 @@
 
       <section class="section">
         <div class="container contact-layout">
-          <form class="contact-form reveal" id="contact-form">
+          <form class="contact-form reveal" id="contact-form" action="/api/contact" method="post">
             <div class="section-heading" style="margin-bottom: 0;">
               <span class="eyebrow">პროექტის ფორმა</span>
               <h2>მოკლე ფორმა, სწრაფი პასუხი.</h2>
@@ -84,6 +84,13 @@
             </div>
 
             <div class="success-banner" id="form-success" aria-live="polite"></div>
+
+            <input name="page" type="hidden" value="contact-ka.html">
+            <input name="language" type="hidden" value="ka">
+            <div class="field field-hidden" aria-hidden="true">
+              <label for="website">Website</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
 
             <div class="form-grid">
               <div class="field">

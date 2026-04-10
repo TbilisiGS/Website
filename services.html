@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
       <div class="container">
         <div class="header-shell">
@@ -46,7 +47,7 @@
       </div>
     </header>
 
-    <main>
+    <main id="main-content">
       <section class="page-hero">
         <div class="container hero-grid">
           <div class="hero-copy reveal">
@@ -76,9 +77,21 @@
         </div>
       </section>
 
+      <section class="section-tight">
+        <div class="container">
+          <div class="service-shortcuts reveal" aria-label="Service shortcuts">
+            <a class="shortcut-pill" href="#website-creation">Website Creation</a>
+            <a class="shortcut-pill" href="#social-media">Social Media</a>
+            <a class="shortcut-pill" href="#branding-visuals">Branding Visuals</a>
+            <a class="shortcut-pill" href="#lead-funnel">Lead Funnel Setup</a>
+            <a class="shortcut-pill" href="#content-design">Content Design</a>
+          </div>
+        </div>
+      </section>
+
       <section class="section">
         <div class="container service-listing">
-          <article class="service-panel reveal">
+          <article class="service-panel reveal" id="website-creation">
             <aside>
               <span class="eyebrow">01. Website Creation</span>
               <h2>Professional websites that make your business easier to trust.</h2>
@@ -98,7 +111,7 @@
             </div>
           </article>
 
-          <article class="service-panel reveal">
+          <article class="service-panel reveal" id="social-media">
             <aside>
               <span class="eyebrow">02. Social Media Management</span>
               <h2>Consistent Instagram and Facebook presence that feels premium.</h2>
@@ -118,7 +131,7 @@
             </div>
           </article>
 
-          <article class="service-panel reveal">
+          <article class="service-panel reveal" id="branding-visuals">
             <aside>
               <span class="eyebrow">03. Branding Visuals</span>
               <h2>Sharper branding for businesses that need to look more serious online.</h2>
@@ -138,7 +151,7 @@
             </div>
           </article>
 
-          <article class="service-panel reveal">
+          <article class="service-panel reveal" id="lead-funnel">
             <aside>
               <span class="eyebrow">04. Lead Funnel Setup</span>
               <h2>Simple conversion paths built around WhatsApp, forms, and landing pages.</h2>
@@ -158,7 +171,7 @@
             </div>
           </article>
 
-          <article class="service-panel reveal">
+          <article class="service-panel reveal" id="content-design">
             <aside>
               <span class="eyebrow">05. Content Design</span>
               <h2>Promotion-ready content for launches, offers, and regular posting.</h2>

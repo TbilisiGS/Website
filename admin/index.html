@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Tbilisi Growth Studio CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/admin.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script defer src="/admin/admin.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero panel">
+        <div>
+          <p class="eyebrow">Internal</p>
+          <h1>Tbilisi Growth Studio CRM</h1>
+          <p class="hero-copy">Sign in with your Supabase admin account to review leads, update status, add notes, and schedule follow-ups.</p>
+        </div>
+        <a class="back-link" href="/contact.html">Back to website</a>
+      </section>
+
+      <section id="status" class="status" hidden></section>
+
+      <section id="auth-panel" class="panel auth-panel">
+        <div>
+          <p class="eyebrow">Admin sign-in</p>
+          <h2>Email and password</h2>
+          <p class="section-copy">Use the same email you inserted into <code>crm_admins</code> in Supabase.</p>
+        </div>
+
+        <form id="login-form" class="auth-form">
+          <label>
+            <span>Email</span>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+          </label>
+
+          <label>
+            <span>Password</span>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+          </label>
+
+          <button id="login-button" class="button" type="submit">Sign in</button>
+        </form>
+      </section>
+
+      <section id="dashboard" class="dashboard" hidden>
+        <div class="panel toolbar-panel">
+          <div>
+            <p class="eyebrow">Lead inbox</p>
+            <h2>Review and update contact submissions</h2>
+          </div>
+
+          <div class="toolbar-actions">
+            <button id="refresh-button" class="button button-secondary" type="button">Refresh</button>
+            <button id="signout-button" class="button button-secondary" type="button">Sign out</button>
+          </div>
+        </div>
+
+        <section class="metric-grid">
+          <article class="metric-card panel">
+            <span class="metric-label">Total leads</span>
+            <strong id="metric-total" class="metric-value">0</strong>
+          </article>
+          <article class="metric-card panel">
+            <span class="metric-label">New</span>
+            <strong id="metric-new" class="metric-value">0</strong>
+          </article>
+          <article class="metric-card panel">
+            <span class="metric-label">Qualified</span>
+            <strong id="metric-qualified" class="metric-value">0</strong>
+          </article>
+          <article class="metric-card panel">
+            <span class="metric-label">Follow-up due</span>
+            <strong id="metric-follow-up" class="metric-value">0</strong>
+          </article>
+        </section>
+
+        <section class="panel filters-panel">
+          <label>
+            <span>Search</span>
+            <input id="search-input" type="search" placeholder="Name, business, contact, service, message, notes">
+          </label>
+
+          <label>
+            <span>Status</span>
+            <select id="status-filter">
+              <option value="all">All statuses</option>
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="qualified">Qualified</option>
+              <option value="won">Won</option>
+              <option value="lost">Lost</option>
+            </select>
+          </label>
+        </section>
+
+        <section>
+          <div id="lead-summary" class="lead-summary"></div>
+          <div id="lead-list" class="lead-list"></div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

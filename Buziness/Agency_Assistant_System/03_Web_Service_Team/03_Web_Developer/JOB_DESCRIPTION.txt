@@ -1,0 +1,13 @@
+Web Developer Job Description
+
+Main responsibilities:
+- Build responsive pages and reusable components.
+- Recommend the right technical stack and implementation approach.
+- Handle forms, integrations, SEO basics, and performance.
+- Keep the codebase maintainable and scalable.
+- QA the site across devices and browsers.
+
+Success looks like:
+- The site is fast, stable, and mobile-friendly.
+- Contact flows work properly.
+- Technical execution supports design and conversion goals.

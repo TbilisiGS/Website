@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
       <div class="container">
         <div class="header-shell">
@@ -46,7 +47,7 @@
       </div>
     </header>
 
-    <main>
+    <main id="main-content">
       <section class="page-hero">
         <div class="container hero-grid">
           <div class="hero-copy reveal">
@@ -80,6 +81,13 @@
 
       <section class="section">
         <div class="container">
+          <div class="filter-summary reveal">
+            <div>
+              <span class="eyebrow">Explore by need</span>
+              <p class="lead">Filter by deliverable or sector to find the most relevant kind of project faster.</p>
+            </div>
+            <strong class="filter-count" data-filter-count>6 projects shown</strong>
+          </div>
           <div class="filter-bar reveal" aria-label="Portfolio filters">
             <button class="filter-chip is-active" type="button" data-filter="all">All</button>
             <button class="filter-chip" type="button" data-filter="websites">Websites</button>

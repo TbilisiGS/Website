@@ -1,0 +1,13 @@
+Web Designer UX Job Description
+
+Main responsibilities:
+- Design page layouts, wireframes, and interface patterns.
+- Build strong section flow, hierarchy, and call-to-action placement.
+- Recommend typography, spacing, imagery, and interaction style.
+- Make the site feel premium on desktop and mobile.
+- Balance aesthetics with usability and conversion.
+
+Success looks like:
+- The site feels polished and easy to use.
+- Key information is easy to scan.
+- Design decisions support trust and action.

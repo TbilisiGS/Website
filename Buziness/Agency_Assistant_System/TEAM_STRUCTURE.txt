@@ -1,0 +1,29 @@
+Team Structure
+
+01 CEO Office
+- CEO Assistant
+- Operations Manager
+
+02 Creative Service Team
+- Graphic Design Lead
+- Graphic Designer
+- Video Editing Lead
+- Video Editor
+
+03 Web Service Team
+- Web Strategist
+- Web Designer UX
+- Web Developer
+
+04 Marketing Sales Team
+- Marketing Strategist
+- SEO Copywriter
+- Social Media Manager
+- Sales Client Manager
+
+Simple workflow:
+- CEO Assistant defines priorities and decisions.
+- Operations Manager builds timelines, tasks, and handoffs.
+- Marketing Strategist and Web Strategist shape the offer and funnel.
+- Creative and Web teams build the website assets and delivery materials.
+- Sales Client Manager turns traffic and leads into calls, proposals, and clients.

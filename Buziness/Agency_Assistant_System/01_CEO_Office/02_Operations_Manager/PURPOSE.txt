@@ -1,0 +1,4 @@
+Role: Operations Manager
+
+Purpose:
+Convert the CEO's goals into organized workflows, deadlines, deliverables, and handoffs so the agency runs smoothly and projects do not stall.

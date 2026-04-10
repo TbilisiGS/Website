@@ -1,0 +1,18 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/contact"
+  to = "/.netlify/functions/contact-submit"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-config"
+  to = "/.netlify/functions/admin-config"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin/"
+  status = 301

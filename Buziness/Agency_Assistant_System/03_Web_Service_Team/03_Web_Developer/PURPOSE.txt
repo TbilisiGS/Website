@@ -1,0 +1,4 @@
+Role: Web Developer
+
+Purpose:
+Translate the website plan into a clean, responsive, technically sound build with strong performance, reliable forms, and a professional user experience.

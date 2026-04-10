@@ -1,0 +1,396 @@
+:root {
+  color-scheme: light;
+  --bg: #f4efe8;
+  --panel: rgba(255, 251, 245, 0.92);
+  --panel-strong: #fffdf9;
+  --border: rgba(69, 55, 34, 0.12);
+  --text: #1d1309;
+  --muted: #6f5c48;
+  --accent: #d9712b;
+  --accent-strong: #aa4f18;
+  --accent-soft: rgba(217, 113, 43, 0.12);
+  --success: #1c7c54;
+  --error: #a63b2c;
+  --shadow: 0 24px 60px rgba(34, 23, 12, 0.12);
+  --radius: 24px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(217, 113, 43, 0.18), transparent 26%),
+    radial-gradient(circle at right 12%, rgba(42, 92, 130, 0.14), transparent 24%),
+    linear-gradient(180deg, #faf4ec 0%, var(--bg) 52%, #efe5d8 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.shell {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding: 2rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1,
+h2 {
+  line-height: 1.05;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+h2 {
+  font-size: clamp(1.4rem, 2vw, 2rem);
+}
+
+.hero-copy,
+.section-copy,
+.lead-summary,
+.metric-label,
+.status,
+label span,
+.lead-field-label,
+.lead-meta dt {
+  color: var(--muted);
+}
+
+.hero-copy,
+.section-copy {
+  max-width: 62ch;
+  margin-top: 0.85rem;
+  line-height: 1.6;
+}
+
+.back-link {
+  flex-shrink: 0;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.8rem 1rem;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.status {
+  margin-top: 1.2rem;
+  padding: 1rem 1.2rem;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+}
+
+.status.is-error {
+  color: var(--error);
+  border-color: rgba(166, 59, 44, 0.2);
+  background: rgba(166, 59, 44, 0.06);
+}
+
+.status.is-success {
+  color: var(--success);
+  border-color: rgba(28, 124, 84, 0.18);
+  background: rgba(28, 124, 84, 0.08);
+}
+
+.auth-panel,
+.toolbar-panel,
+.filters-panel,
+.metric-card,
+.lead-card {
+  padding: 1.4rem;
+}
+
+.auth-panel,
+.filters-panel {
+  margin-top: 1.2rem;
+}
+
+.auth-form,
+.filters-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.auth-form label,
+.filters-panel label,
+.editor-grid label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid rgba(63, 43, 24, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text);
+  padding: 0.9rem 1rem;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.button {
+  border: none;
+  border-radius: 16px;
+  padding: 0.95rem 1.2rem;
+  font-weight: 700;
+  color: #fffaf4;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+}
+
+.button:hover,
+.button:focus-visible {
+  filter: brightness(0.98);
+}
+
+.button:disabled {
+  opacity: 0.68;
+  cursor: wait;
+}
+
+.button-secondary {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--border);
+}
+
+.auth-form .button {
+  align-self: end;
+}
+
+.dashboard {
+  margin-top: 1.2rem;
+}
+
+.toolbar-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.metric-card {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.metric-value {
+  font-size: clamp(1.8rem, 2.4vw, 2.8rem);
+  line-height: 1;
+}
+
+.filters-panel {
+  align-items: end;
+}
+
+.lead-summary {
+  margin: 1rem 0;
+  padding-left: 0.2rem;
+}
+
+.lead-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.lead-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.lead-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.lead-title {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.lead-title strong {
+  font-size: 1.1rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.lead-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0;
+}
+
+.lead-meta div {
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.lead-meta dt {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+}
+
+.lead-meta dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.lead-message {
+  border-radius: 20px;
+  padding: 1rem 1.1rem;
+  background: rgba(255, 255, 255, 0.68);
+  line-height: 1.6;
+}
+
+.lead-message p {
+  margin: 0;
+}
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: 180px 220px minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.lead-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.save-state {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.empty-state {
+  padding: 1.4rem;
+  text-align: center;
+}
+
+@media (max-width: 960px) {
+  .metric-grid,
+  .lead-meta,
+  .editor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .shell {
+    width: min(100% - 1rem, 720px);
+    padding: 1rem 0 2rem;
+  }
+
+  .hero,
+  .toolbar-panel,
+  .auth-form,
+  .filters-panel,
+  .metric-grid,
+  .lead-meta,
+  .editor-grid,
+  .lead-header,
+  .lead-actions {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .hero,
+  .toolbar-panel {
+    gap: 1rem;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+  }
+
+  .toolbar-actions .button,
+  .auth-form .button {
+    width: 100%;
+  }
+}

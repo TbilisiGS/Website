@@ -178,6 +178,12 @@ document.querySelectorAll("[data-nav]").forEach((link) => {
 });
 
 if (navToggle && siteNav) {
+  const closeNav = () => {
+    siteNav.classList.remove("is-open");
+    navToggle.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-open");
+  };
+
   navToggle.addEventListener("click", () => {
     const isOpen = siteNav.classList.toggle("is-open");
     navToggle.setAttribute("aria-expanded", String(isOpen));
@@ -185,11 +191,20 @@ if (navToggle && siteNav) {
   });
 
   siteNav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      siteNav.classList.remove("is-open");
-      navToggle.setAttribute("aria-expanded", "false");
-      document.body.classList.remove("menu-open");
-    });
+    link.addEventListener("click", closeNav);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!siteNav.classList.contains("is-open")) return;
+    if (siteNav.contains(event.target) || navToggle.contains(event.target)) return;
+    closeNav();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && siteNav.classList.contains("is-open")) {
+      closeNav();
+      navToggle.focus();
+    }
   });
 }
 
@@ -224,8 +239,18 @@ if ("IntersectionObserver" in window && revealNodes.length) {
 
 const filterButtons = document.querySelectorAll("[data-filter]");
 const projectCards = document.querySelectorAll(".project-card[data-categories]");
+const filterCount = document.querySelector("[data-filter-count]");
 
 if (filterButtons.length && projectCards.length) {
+  const updateFilterCount = () => {
+    if (!filterCount) return;
+    const visibleCount = Array.from(projectCards).filter((card) => !card.classList.contains("is-hidden")).length;
+    filterCount.textContent =
+      currentLang === "ka"
+        ? `${visibleCount} პროექტი ჩანს`
+        : `${visibleCount} project${visibleCount === 1 ? "" : "s"} shown`;
+  };
+
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const filter = button.dataset.filter;
@@ -236,8 +261,12 @@ if (filterButtons.length && projectCards.length) {
         const categories = (card.dataset.categories || "").split(" ");
         card.classList.toggle("is-hidden", !(filter === "all" || categories.includes(filter)));
       });
+
+      updateFilterCount();
     });
   });
+
+  updateFilterCount();
 }
 
 const modal = document.getElementById("project-modal");
@@ -291,13 +320,275 @@ const contactForm = document.getElementById("contact-form");
 
 if (contactForm) {
   const successBanner = document.getElementById("form-success");
+  const submitButton = contactForm.querySelector('button[type="submit"]');
+  const endpoint = contactForm.getAttribute("action") || "/api/contact";
+  const escapeHtml = (value) =>
+    value.replace(/[&<>"']/g, (char) => {
+      const map = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      };
+
+      return map[char];
+    });
+  const trimValue = (value) => (value || "").toString().trim();
+  const uiCopy = {
+    en: {
+      submitting: "Sending...",
+      successTitle: "Your request was sent.",
+      successText: (name, business) =>
+        `${name}, your details for ${business} were stored securely. We will reply within one business day.`,
+      errorTitle: "The secure form endpoint is not available yet.",
+      errorText:
+        "Your message could not be stored from this page right now. Use WhatsApp or email below while the secure form endpoint is being connected.",
+      whatsappLabel: "Open WhatsApp draft",
+      emailLabel: "Open email draft"
+    },
+    ka: {
+      submitting: "იტვირთება...",
+      successTitle: "თქვენი მოთხოვნა გაიგზავნა.",
+      successText: (name, business) =>
+        `${name}, ${business}-ისთვის გამოგზავნილი დეტალები უსაფრთხოდ შეინახა. ერთ სამუშაო დღეში დაგიკავშირდებით.`,
+      errorTitle: "უსაფრთხო ფორმის მისამართი ჯერ სრულად არ არის დაკავშირებული.",
+      errorText:
+        "ამ გვერდიდან თქვენი შეტყობინების შენახვა ახლა ვერ მოხერხდა. სანამ ფორმის საცავი საბოლოოდ დაერთვება, გამოიყენეთ WhatsApp ან email ქვემოთ.",
+      whatsappLabel: "გახსენით WhatsApp-ის მონახაზი",
+      emailLabel: "გახსენით email-ის მონახაზი"
+    }
+  };
+  const copy = uiCopy[currentLang] || uiCopy.en;
+
+  if (submitButton && !submitButton.dataset.defaultLabel) {
+    submitButton.dataset.defaultLabel = submitButton.textContent.trim();
+  }
+
+  const setSubmittingState = (isSubmitting) => {
+    if (!submitButton) return;
+    submitButton.disabled = isSubmitting;
+    submitButton.textContent = isSubmitting
+      ? copy.submitting
+      : submitButton.dataset.defaultLabel || submitButton.textContent;
+  };
+
+  const showBanner = (type, title, text, actions = "") => {
+    if (!successBanner) return;
+    successBanner.innerHTML = `
+      <strong>${escapeHtml(title)}</strong>
+      <p>${escapeHtml(text)}</p>
+      ${actions}
+    `;
+    successBanner.classList.add("is-visible");
+    successBanner.classList.toggle("is-error", type === "error");
+    successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  };
+
+  const buildFallbackLinks = ({ name, business, contact, service, message }) => {
+    const safeName = name || "there";
+    const safeBusiness = business || "your business";
+    const safeService = service || (currentLang === "ka" ? "არ არის მითითებული" : "Not specified");
+
+    const emailSubject =
+      currentLang === "ka"
+        ? `ახალი მოთხოვნა - ${safeBusiness}`
+        : `New project inquiry - ${safeBusiness}`;
+
+    const emailBody =
+      currentLang === "ka"
+        ? [
+            `სახელი: ${safeName}`,
+            `ბიზნესი: ${safeBusiness}`,
+            `კონტაქტი: ${contact}`,
+            `სერვისი: ${safeService}`,
+            "",
+            "მესიჯი:",
+            message
+          ].join("\n")
+        : [
+            `Name: ${safeName}`,
+            `Business: ${safeBusiness}`,
+            `Contact: ${contact}`,
+            `Service: ${safeService}`,
+            "",
+            "Message:",
+            message
+          ].join("\n");
+
+    const whatsappText =
+      currentLang === "ka"
+        ? [
+            `გამარჯობა, მე ვარ ${safeName}.`,
+            `ბიზნესი: ${safeBusiness}`,
+            `კონტაქტი: ${contact}`,
+            `სერვისი: ${safeService}`,
+            "",
+            message
+          ].join("\n")
+        : [
+            `Hello, my name is ${safeName}.`,
+            `Business: ${safeBusiness}`,
+            `Contact: ${contact}`,
+            `Service needed: ${safeService}`,
+            "",
+            message
+          ].join("\n");
+
+    return {
+      emailHref: `mailto:hello@tbilisigrowthstudio.ge?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`,
+      whatsappHref: `https://wa.me/995555241890?text=${encodeURIComponent(whatsappText)}`
+    };
+  };
 
   contactForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    void (async () => {
+      const data = new FormData(contactForm);
+      const payload = {
+        name: trimValue(data.get("name")),
+        business: trimValue(data.get("business")),
+        contact: trimValue(data.get("contact")),
+        service: trimValue(data.get("service")),
+        message: trimValue(data.get("message")),
+        website: trimValue(data.get("website")),
+        page: trimValue(data.get("page")) || window.location.pathname.split("/").pop() || "contact.html",
+        language: trimValue(data.get("language")) || currentLang
+      };
+
+      if (!payload.name || !payload.business || !payload.contact || !payload.message) {
+        contactForm.reportValidity();
+        return;
+      }
+
+      setSubmittingState(true);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        let result = null;
+        const responseType = response.headers.get("content-type") || "";
+        if (responseType.includes("application/json")) {
+          result = await response.json();
+        }
+
+        if (!response.ok || (result && result.ok === false)) {
+          throw new Error((result && result.error) || `Request failed with status ${response.status}`);
+        }
+
+        showBanner("success", copy.successTitle, copy.successText(payload.name, payload.business));
+        contactForm.reset();
+      } catch (error) {
+        console.error(error);
+        const fallbackLinks = buildFallbackLinks(payload);
+        showBanner(
+          "error",
+          copy.errorTitle,
+          copy.errorText,
+          `
+            <div class="success-actions">
+              <a class="button button-primary" href="${fallbackLinks.whatsappHref}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.whatsappLabel)}</a>
+              <a class="button button-secondary" href="${fallbackLinks.emailHref}">${escapeHtml(copy.emailLabel)}</a>
+            </div>
+          `
+        );
+      } finally {
+        setSubmittingState(false);
+      }
+    })();
+
+    return;
+
     const data = new FormData(contactForm);
     const name = (data.get("name") || "there").toString().trim();
     const business = (data.get("business") || "your business").toString().trim();
+    const contact = (data.get("contact") || "").toString().trim();
+    const service = (data.get("service") || "").toString().trim();
+    const message = (data.get("message") || "").toString().trim();
+
+    const emailSubject =
+      currentLang === "ka"
+        ? `ახალი მოთხოვნა - ${business}`
+        : `New project inquiry - ${business}`;
+
+    const emailBody =
+      currentLang === "ka"
+        ? [
+            `სახელი: ${name}`,
+            `ბიზნესი: ${business}`,
+            `კონტაქტი: ${contact}`,
+            `სერვისი: ${service || "არ არის მითითებული"}`,
+            "",
+            "მესიჯი:",
+            message
+          ].join("\n")
+        : [
+            `Name: ${name}`,
+            `Business: ${business}`,
+            `Contact: ${contact}`,
+            `Service: ${service || "Not specified"}`,
+            "",
+            "Message:",
+            message
+          ].join("\n");
+
+    const whatsappText =
+      currentLang === "ka"
+        ? [
+            `გამარჯობა, მე ვარ ${name}.`,
+            `ბიზნესი: ${business}`,
+            `კონტაქტი: ${contact}`,
+            `სერვისი: ${service || "არ არის მითითებული"}`,
+            "",
+            message
+          ].join("\n")
+        : [
+            `Hello, my name is ${name}.`,
+            `Business: ${business}`,
+            `Contact: ${contact}`,
+            `Service needed: ${service || "Not specified"}`,
+            "",
+            message
+          ].join("\n");
+
+    const whatsappHref = `https://wa.me/995555241890?text=${encodeURIComponent(whatsappText)}`;
+    const emailHref = `mailto:hello@tbilisigrowthstudio.ge?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+    if (successBanner) {
+      const bannerTitle =
+        currentLang === "ka" ? "თქვენი მოთხოვნის მონახაზი მზად არის." : "Your request draft is ready.";
+      const bannerText =
+        currentLang === "ka"
+          ? `${name}, აირჩიეთ WhatsApp ან email ქვემოთ და გაგზავნეთ წინასწარ შევსებული მოთხოვნა ${business}-ისთვის.`
+          : `${name}, choose WhatsApp or email below to send your pre-filled request for ${business}.`;
+      const whatsappLabel =
+        currentLang === "ka" ? "გახსენით WhatsApp-ის მონახაზი" : "Open WhatsApp draft";
+      const emailLabel =
+        currentLang === "ka" ? "გახსენით email-ის მონახაზი" : "Open email draft";
+
+      successBanner.innerHTML = `
+        <strong>${escapeHtml(bannerTitle)}</strong>
+        <p>${escapeHtml(bannerText)}</p>
+        <div class="success-actions">
+          <a class="button button-primary" href="${whatsappHref}" target="_blank" rel="noopener noreferrer">${escapeHtml(whatsappLabel)}</a>
+          <a class="button button-secondary" href="${emailHref}">${escapeHtml(emailLabel)}</a>
+        </div>
+      `;
+      successBanner.classList.add("is-visible");
+      successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    contactForm.reset();
+    return;
+    /*
 
     if (successBanner) {
       if (currentLang === "ka") {
@@ -320,5 +611,6 @@ if (contactForm) {
     }
 
     contactForm.reset();
+    */
   });
 }
