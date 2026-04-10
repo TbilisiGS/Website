@@ -1,0 +1,852 @@
+Website goal
+
+The website should look like a modern, premium, local digital agency site made to convince small Tbilisi business owners that you can get them more customers.
+
+It should not feel like an art portfolio.
+It should feel like:
+
+trustworthy
+
+sharp
+
+visually strong
+
+simple to understand
+
+easy to contact
+
+The whole website should be built around one idea:
+
+"We help Tbilili businesses get more inquiries through websites, social media, and better online presentation."
+
+Overall style
+Visual direction
+
+Use a dark modern premium style with clean spacing.
+
+Best look:
+
+dark charcoal or deep navy background
+
+white or light gray text
+
+one strong accent color like electric blue, purple, or cyan
+
+smooth hover animations
+
+rounded cards
+
+subtle shadows
+
+clean icons
+
+modern sans-serif font
+
+It should look more like a premium creative growth studio than a cheap freelancer page.
+
+Tone of design
+
+minimal
+
+high-end
+
+masculine
+
+clean
+
+confident
+
+not crowded
+
+not playful
+
+not corporate-boring
+
+UX structure
+
+The website should be very simple and conversion-focused.
+
+Main rule:
+A visitor should understand in 5 seconds:
+
+what you do
+
+who you do it for
+
+why you are useful
+
+how to contact you
+
+Do not make users think too much.
+
+Website pages
+
+You should build these pages:
+
+1. Home
+
+Main sales page.
+
+2. Services
+
+Clearly explain what you offer.
+
+3. Portfolio / Case Studies
+
+Show examples, even if first they are mockups.
+
+4. About
+
+Short trust-building page.
+
+5. Contact
+
+Simple direct contact page.
+
+Optional later:
+
+6. Pricing
+
+Only if you want transparency or lead filtering.
+
+Header / navigation
+
+The top navigation should be sticky.
+
+Left side
+
+logo or text logo
+
+Right side
+
+Home
+
+Services
+
+Portfolio
+
+About
+
+Contact
+
+a highlighted button: Book Free Audit or Get a Quote
+
+UX notes
+
+sticky on scroll
+
+slightly blurred or semi-transparent background
+
+active hover states
+
+mobile hamburger menu
+
+Home page layout
+Section 1 - Hero section
+
+This is the most important section.
+
+Layout
+
+Two-column layout on desktop:
+
+left: headline, subheadline, CTA buttons
+
+right: visual mockup, website preview, phone screen, or agency-style design collage
+
+Must include
+
+Headline
+Very direct result-focused statement.
+
+Example direction:
+
+We help Tbilisi businesses get more customers online
+
+Websites and social media that bring more inquiries
+
+Better digital presence for local businesses
+
+Subheadline
+Short sentence explaining what you do.
+
+Example direction:
+
+We build modern websites, strong social media branding, and simple lead funnels for businesses in Tbilisi.
+
+Buttons
+Primary:
+
+Book Free Audit
+Secondary:
+
+View Portfolio
+
+UI notes
+
+strong typography
+
+large headline
+
+one accent color on key words
+
+animated button hover
+
+subtle visual motion in hero image
+
+Section 2 - Trust / quick credibility
+
+This section should instantly reduce doubt.
+
+Include
+
+"For salons, dentists, cafes, real estate, and local businesses"
+
+number of projects or sample works
+
+fast turnaround point
+
+local market understanding
+
+bilingual communication if relevant
+
+UI
+
+Use 3 or 4 small cards in one row.
+
+Example card titles:
+
+Modern websites
+
+Strong branding
+
+Fast delivery
+
+Lead-focused setup
+
+Section 3 - Problem / solution
+
+This part should show you understand client pain.
+
+Layout
+
+Left side: common problems
+Right side: your solution
+
+Problems examples
+
+outdated website
+
+weak Instagram page
+
+no clear booking flow
+
+inconsistent branding
+
+no real lead system
+
+Right side
+
+Show how your service fixes it.
+
+UX note
+
+This should be scannable, not text heavy.
+
+Use icons, short bullets, or card blocks.
+
+Section 4 - Services preview
+
+Show 3 main service cards.
+
+Cards
+
+Website Creation
+
+Social Media Management
+
+Lead Funnel Setup
+
+Each card should include:
+
+short description
+
+who it is for
+
+button like "Learn More"
+
+UI
+
+equal-height cards
+
+icon at top
+
+hover lift effect
+
+strong spacing
+
+simple structure
+
+Section 5 - Portfolio preview
+
+This section should visually sell your taste and capability.
+
+Must show
+
+website mockups
+
+Instagram grid examples
+
+before/after redesigns
+
+business niche examples
+
+Layout
+
+Grid of image cards
+
+Each card can have:
+
+business type
+
+what you improved
+
+button to view case
+
+UX
+
+Images should open cleanly or go to a case study page.
+Keep it visual first, text second.
+
+Section 6 - How it works
+
+Make buying simple.
+
+3-step or 4-step flow
+
+You contact us
+
+We audit your presence
+
+We build and launch
+
+You get more inquiries
+
+UI
+
+Horizontal step blocks on desktop
+Vertical stacked blocks on mobile
+
+Use numbers and icons.
+
+Section 7 - Why choose us
+
+This is your differentiator section.
+
+Include points like
+
+local Tbilisi business understanding
+
+premium visuals
+
+fast communication
+
+website + content under one roof
+
+practical focus on leads, not random design
+
+UI
+
+Use comparison-style cards or icon list.
+
+Section 8 - Testimonial / proof section
+
+Even if you start with mock proof, later this must become real.
+
+Can include
+
+client testimonials
+
+screenshots
+
+mini results
+
+quote blocks
+
+UI
+
+Use slider or 2-3 quote cards.
+
+Do not overload.
+
+Section 9 - Final CTA
+
+End the homepage with a strong conversion section.
+
+Include
+
+Headline like:
+
+Ready to improve your business online?
+
+Let’s make your business look professional and convert better
+
+Buttons
+
+Book Free Audit
+
+Message on WhatsApp
+
+This section should be visually stronger than others.
+Use accent background or glow.
+
+Footer
+Include
+
+logo
+
+short one-line business statement
+
+navigation links
+
+WhatsApp
+
+email
+
+Instagram
+
+Facebook if needed
+
+location: Tbilisi, Georgia
+
+UX
+
+Simple clean footer.
+Do not overcrowd.
+
+Services page
+
+This page should explain each service clearly.
+
+Structure
+
+For each service include:
+
+title
+
+who it is for
+
+what is included
+
+expected outcome
+
+CTA button
+
+Best layout
+
+Vertical sections or large service cards.
+
+Services to explain
+
+website creation
+
+social media management
+
+branding visuals
+
+lead funnel setup
+
+content design
+
+add-ons
+
+UX note
+
+Keep descriptions direct and business-focused.
+Avoid too much technical language.
+
+Portfolio page
+
+This page is one of the most important.
+
+What it should show
+
+website mockups
+
+Instagram feed designs
+
+landing pages
+
+branding improvements
+
+niche examples
+
+Best structure
+
+Filterable grid.
+
+Filters:
+
+Websites
+
+Social Media
+
+Branding
+
+Real Estate
+
+Beauty
+
+Medical
+
+Food
+
+Each project card
+
+thumbnail
+
+project type
+
+niche
+
+short result summary
+
+When clicked
+
+Open project details with:
+
+problem
+
+solution
+
+visuals
+
+tools used
+
+outcome
+
+About page
+
+This page should be short and trust-building.
+
+Must say
+
+who you are
+
+what this studio does
+
+why you focus on local businesses
+
+what kind of results you care about
+
+Tone
+
+Confident but not over-emotional.
+
+Layout
+
+short intro section
+
+your image or branded visual
+
+3 value blocks
+
+CTA
+
+Contact page
+
+This page should remove friction completely.
+
+Must include
+
+short contact form
+
+WhatsApp button
+
+email
+
+Instagram link
+
+optional calendar booking
+
+simple text like "Tell us about your business and what you need"
+
+Best form fields
+
+name
+
+business name
+
+phone or email
+
+service needed
+
+short message
+
+UX note
+
+Make form short.
+Do not ask too much.
+
+Mobile UX
+
+Very important because many local users will view from phone.
+
+Must be optimized for
+
+fast loading
+
+thumb-friendly buttons
+
+readable text
+
+stacked layout
+
+sticky contact button if possible
+
+Good mobile additions
+
+floating WhatsApp button
+
+tap-to-call
+
+simplified menu
+
+compressed images
+
+UI components to include
+Buttons
+
+Use 2 main button styles:
+
+primary accent button
+
+secondary outline button
+
+Cards
+
+Use throughout site for:
+
+services
+
+testimonials
+
+benefits
+
+process steps
+
+portfolio items
+
+Icons
+
+Use clean line icons.
+Do not use childish icons.
+
+Animations
+
+Use subtle animations only:
+
+fade-in on scroll
+
+hover lift on cards
+
+button glow or shift
+
+smooth page transitions
+
+Do not overdo motion.
+
+Functionality
+
+The website should not just look good.
+It should work as a lead machine.
+
+Must-have functionality
+
+responsive design
+
+contact form
+
+WhatsApp click button
+
+Instagram/Facebook links
+
+CTA buttons throughout
+
+portfolio filtering
+
+basic SEO setup
+
+fast loading
+
+Google Maps on contact page
+
+thank-you message after form submit
+
+Good extra functionality
+
+booking/calendar integration
+
+analytics tracking
+
+testimonial slider
+
+before/after image comparison
+
+lead form popup
+
+sticky CTA on mobile
+
+SEO structure
+
+The site should be structured so it can rank locally.
+
+Important pages/targets
+
+website design Tbilisi
+
+social media management Tbilisi
+
+branding for small business Tbilisi
+
+digital agency Tbilisi
+
+Instagram management Georgia
+
+On-page setup
+
+clear H1 per page
+
+good title tags
+
+service keywords naturally placed
+
+image alt text
+
+local wording
+
+fast speed
+
+mobile optimization
+
+Conversion strategy
+
+The site should ask for contact many times, but cleanly.
+
+Best CTA placements
+
+hero section
+
+after services
+
+after portfolio
+
+after process
+
+footer
+
+contact page
+
+floating mobile CTA
+
+Best CTA wording
+
+Book Free Audit
+
+Get a Quote
+
+Message on WhatsApp
+
+Let’s Talk
+
+Improve My Business Page
+
+Best layout summary
+Home page order
+
+Header
+
+Hero
+
+Trust cards
+
+Problem / solution
+
+Services
+
+Portfolio preview
+
+Process
+
+Why choose us
+
+Testimonials
+
+Final CTA
+
+Footer
+
+What it should feel like
+
+When someone opens the site, they should feel:
+
+this looks professional
+
+this person understands business
+
+this is modern
+
+this is not random freelance work
+
+this can help me get customers
+
+contacting is easy
+
+What to avoid
+
+Do not make it:
+
+too colorful
+
+too artistic
+
+too busy
+
+too text-heavy
+
+too technical
+
+too generic
+
+too playful
+
+too empty with no proof
+
+too slow with huge images
+
+Final exact direction
+
+Build a dark, premium, modern agency-style website with:
+
+strong headline
+
+clear service cards
+
+visual portfolio
+
+multiple CTAs
+
+short trust-building copy
+
+WhatsApp-focused contact flow
+
+mobile-first responsiveness
+
+smooth but subtle animations
+
+local Tbilisi business positioning
+
+It should mainly sell:
+websites + social media + better inquiry flow for local businesses.
+
+If you want, next I can write the exact text for every section of the homepage.
