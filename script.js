@@ -166,6 +166,210 @@ const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".site-nav");
 const currentPage = pageMap[window.location.pathname.split("/").pop()] || "home";
 const currentLang = document.documentElement.lang.startsWith("ka") ? "ka" : "en";
+const siteConfig = window.TGSiteConfig || {};
+const contactConfig = siteConfig.contact || {};
+
+const escapeHtml = (value) =>
+  String(value).replace(/[&<>"']/g, (char) => {
+    const map = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    };
+
+    return map[char];
+  });
+
+const isDialogBackdropClick = (dialog, event) => {
+  const rect = dialog.getBoundingClientRect();
+
+  return !(
+    event.clientX >= rect.left &&
+    event.clientX <= rect.right &&
+    event.clientY >= rect.top &&
+    event.clientY <= rect.bottom
+  );
+};
+
+const resolvePromoAction = (action) => {
+  if (!action) return null;
+
+  if (action.type === "whatsapp") {
+    const whatsappNumber = contactConfig.whatsappNumber || "995597199500";
+    const message = action.message ? `?text=${encodeURIComponent(action.message)}` : "";
+
+    return {
+      href: `https://wa.me/${whatsappNumber}${message}`,
+      target: "_blank",
+      rel: "noopener noreferrer"
+    };
+  }
+
+  const href = action.href || "#";
+  const isExternal = /^https?:\/\//i.test(href);
+
+  return {
+    href,
+    target: action.newTab || isExternal ? "_blank" : "",
+    rel: isExternal ? "noopener noreferrer" : ""
+  };
+};
+
+const promoPopupConfig = siteConfig.promoPopup;
+
+if (promoPopupConfig?.enabled) {
+  const showOnPages = promoPopupConfig.showOnPages;
+  const pageAllowed = !Array.isArray(showOnPages) || !showOnPages.length || showOnPages.includes(currentPage);
+  const content = promoPopupConfig.content?.[currentLang] || promoPopupConfig.content?.en;
+  const storageKey = promoPopupConfig.storageKey || "tgs-promo-popup";
+  const version = promoPopupConfig.version || "default";
+
+  const hasActiveDismissPreference = () => {
+    try {
+      const storedValue = localStorage.getItem(storageKey);
+      if (!storedValue) return false;
+
+      const parsedValue = JSON.parse(storedValue);
+      if (parsedValue.version !== version) return false;
+      if (Number(parsedValue.dismissedUntil) > Date.now()) return true;
+
+      localStorage.removeItem(storageKey);
+      return false;
+    } catch (error) {
+      console.warn("Promo popup preference could not be read.", error);
+      return false;
+    }
+  };
+
+  if (pageAllowed && content && !hasActiveDismissPreference()) {
+    const pointsMarkup = Array.isArray(content.points) && content.points.length
+      ? `
+          <ul class="promo-popup-points">
+            ${content.points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}
+          </ul>
+        `
+      : "";
+
+    const buildActionMarkup = (action, tone) => {
+      const resolvedAction = resolvePromoAction(action);
+      if (!resolvedAction) return "";
+
+      const targetAttr = resolvedAction.target ? ` target="${resolvedAction.target}"` : "";
+      const relAttr = resolvedAction.rel ? ` rel="${resolvedAction.rel}"` : "";
+
+      return `
+        <a class="button promo-popup-button promo-popup-button-${tone}" href="${escapeHtml(resolvedAction.href)}"${targetAttr}${relAttr} data-promo-action>
+          ${escapeHtml(action.label)}
+        </a>
+      `;
+    };
+
+    const promoPopup = document.createElement("dialog");
+    promoPopup.className = "promo-popup";
+    promoPopup.setAttribute("aria-labelledby", "promo-popup-title");
+    promoPopup.setAttribute("aria-describedby", "promo-popup-description");
+    promoPopup.innerHTML = `
+      <div class="promo-popup-card">
+        <button class="promo-popup-close" type="button" aria-label="${currentLang === "ka" ? "ფანჯრის დახურვა" : "Close offer popup"}" data-promo-close>
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <span class="promo-popup-glow promo-popup-glow-a" aria-hidden="true"></span>
+        <span class="promo-popup-glow promo-popup-glow-b" aria-hidden="true"></span>
+        <span class="promo-popup-glow promo-popup-glow-c" aria-hidden="true"></span>
+        <div class="promo-popup-inner">
+          <span class="promo-popup-eyebrow">${escapeHtml(content.eyebrow || "")}</span>
+          <h2 class="promo-popup-title" id="promo-popup-title">
+            <span class="promo-popup-title-top">${escapeHtml(content.titleTop || "")}</span>
+            <span class="promo-popup-title-main">${escapeHtml(content.titleMain || "")}</span>
+          </h2>
+          <p class="promo-popup-description" id="promo-popup-description">${escapeHtml(content.description || "")}</p>
+          ${pointsMarkup}
+          <div class="promo-popup-actions">
+            ${buildActionMarkup(content.primaryCta, "primary")}
+            ${buildActionMarkup(content.secondaryCta, "secondary")}
+          </div>
+          <label class="promo-popup-optout">
+            <input type="checkbox" data-promo-optout>
+            <span>${escapeHtml(content.optOutLabel || "")}</span>
+          </label>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(promoPopup);
+
+    const closeButton = promoPopup.querySelector("[data-promo-close]");
+    const optOutCheckbox = promoPopup.querySelector("[data-promo-optout]");
+    const hideForDays = Number(promoPopupConfig.hideForDays) || 14;
+    const hideDurationMs = hideForDays * 24 * 60 * 60 * 1000;
+
+    const persistDismissPreference = (reason) => {
+      if (!optOutCheckbox?.checked) return;
+
+      try {
+        localStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            version,
+            reason,
+            dismissedUntil: Date.now() + hideDurationMs
+          })
+        );
+      } catch (error) {
+        console.warn("Promo popup preference could not be stored.", error);
+      }
+    };
+
+    const closePromoPopup = (reason) => {
+      persistDismissPreference(reason);
+
+      if (typeof promoPopup.close === "function" && promoPopup.open) {
+        promoPopup.close();
+      } else {
+        promoPopup.removeAttribute("open");
+        document.body.classList.remove("promo-popup-open");
+        promoPopup.remove();
+      }
+    };
+
+    closeButton?.addEventListener("click", () => closePromoPopup("close-button"));
+
+    promoPopup.querySelectorAll("[data-promo-action]").forEach((link) => {
+      link.addEventListener("click", () => persistDismissPreference("cta"));
+    });
+
+    promoPopup.addEventListener("click", (event) => {
+      if (isDialogBackdropClick(promoPopup, event)) {
+        closePromoPopup("backdrop");
+      }
+    });
+
+    promoPopup.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closePromoPopup("escape");
+    });
+
+    promoPopup.addEventListener("close", () => {
+      document.body.classList.remove("promo-popup-open");
+      promoPopup.remove();
+    });
+
+    window.setTimeout(() => {
+      if (!promoPopup.isConnected) return;
+
+      if (typeof promoPopup.showModal === "function") {
+        promoPopup.showModal();
+      } else {
+        promoPopup.setAttribute("open", "");
+        document.body.classList.add("promo-popup-open");
+      }
+
+      closeButton?.focus();
+    }, Math.max(0, Number(promoPopupConfig.delayMs) || 0));
+  }
+}
 
 document.querySelectorAll("[data-year]").forEach((node) => {
   node.textContent = new Date().getFullYear();
@@ -436,8 +640,8 @@ if (contactForm) {
           ].join("\n");
 
     return {
-      emailHref: `mailto:hello@tbilisigrowthstudio.ge?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`,
-      whatsappHref: `https://wa.me/995555241890?text=${encodeURIComponent(whatsappText)}`
+      emailHref: `mailto:tbilisigrowthstudio@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`,
+      whatsappHref: `https://wa.me/995597199500?text=${encodeURIComponent(whatsappText)}`
     };
   };
 
@@ -559,8 +763,8 @@ if (contactForm) {
             message
           ].join("\n");
 
-    const whatsappHref = `https://wa.me/995555241890?text=${encodeURIComponent(whatsappText)}`;
-    const emailHref = `mailto:hello@tbilisigrowthstudio.ge?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    const whatsappHref = `https://wa.me/995597199500?text=${encodeURIComponent(whatsappText)}`;
+    const emailHref = `mailto:tbilisigrowthstudio@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
     if (successBanner) {
       const bannerTitle =
@@ -614,3 +818,431 @@ if (contactForm) {
     */
   });
 }
+
+// --- Custom Ghost Cursor Animation ---
+(function initGhostCursor() {
+  // Only init on non-touch devices to avoid weird mobile behavior
+  if (window.matchMedia("(pointer: coarse)").matches) return;
+
+  const ghost = document.createElement("div");
+  ghost.className = "ghost-cursor";
+  
+  // Custom SVG matching a typical pointer, filled black with white stroke to remain highly visible
+  ghost.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="#000000" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z"/></svg>';
+  
+  document.body.appendChild(ghost);
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let ghostX = mouseX;
+  let ghostY = mouseY;
+  
+  let isClicking = false;
+
+  window.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  window.addEventListener("mousedown", () => isClicking = true);
+  window.addEventListener("mouseup", () => isClicking = false);
+
+  function animate() {
+    // Smooth lerp (linear interpolation) following
+    ghostX += (mouseX - ghostX) * 0.15;
+    ghostY += (mouseY - ghostY) * 0.15;
+    
+    // Scale 1.2 normally, 1.45 on click for a satisfying pop animation
+    const scale = isClicking ? 1.45 : 1.2;
+    
+    // Mirrored horizontally: scaleX(-1). This positions it right underneath pointing opposite.
+    ghost.style.transform = `translate3d(${ghostX}px, ${ghostY}px, 0) scaleX(-1) scale(${scale})`;
+    
+    requestAnimationFrame(animate);
+  }
+  
+  // Start the animation loop
+  requestAnimationFrame(animate);
+})();
+
+// --- Interactive Shatter Button Physics ---
+(function initShatterButtons() {
+  if (window.matchMedia("(pointer: coarse)").matches) return;
+
+  const shatterButtons = document.querySelectorAll('.shatter-btn');
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  shatterButtons.forEach(btn => {
+    const labelText = btn.textContent.replace(/\s+/g, ' ').trim();
+    btn.innerHTML = '';
+
+    const backer = document.createElement('div');
+    backer.className = 'shatter-backer';
+    btn.appendChild(backer);
+
+    const textLayer = document.createElement('span');
+    textLayer.className = 'shatter-text-layer';
+
+    const wordsWrap = document.createElement('span');
+    wordsWrap.className = 'shatter-word-set';
+
+    const words = labelText ? labelText.split(' ') : [''];
+    const midpoint = (words.length - 1) / 2;
+    const wordElements = [];
+
+    words.forEach((word, index) => {
+      const wordEl = document.createElement('span');
+      const distanceFromCenter = index - midpoint;
+      const direction = distanceFromCenter === 0 ? (index % 2 === 0 ? -1 : 1) : Math.sign(distanceFromCenter);
+      const magnitude = Math.abs(distanceFromCenter);
+      const translateX = (direction * (16 + (magnitude * 9))) + (distanceFromCenter * 6);
+      const translateY = ((index % 2 === 0 ? -1 : 1) * (10 + (magnitude * 4)));
+      const rotate = direction * (7 + (magnitude * 5));
+
+      wordEl.className = 'shatter-word';
+      wordEl.textContent = word;
+      wordEl.dataset.baseX = `${translateX}`;
+      wordEl.dataset.baseY = `${translateY}`;
+      wordEl.style.setProperty('--word-rotate', `${rotate}deg`);
+      wordEl.style.setProperty('--word-z', `${12 + (magnitude * 12)}px`);
+
+      wordsWrap.appendChild(wordEl);
+      wordElements.push(wordEl);
+    });
+
+    textLayer.appendChild(wordsWrap);
+    btn.appendChild(textLayer);
+
+    const shardsContainer = document.createElement('div');
+    shardsContainer.className = 'shards-container';
+    btn.appendChild(shardsContainer);
+
+    let currentProgress = 0;
+    let targetProgress = 0;
+    let rafId = 0;
+    let layoutKey = '';
+
+    const calibrateWordMotion = () => {
+      const btnRect = btn.getBoundingClientRect();
+      if (!btnRect.width || !btnRect.height) return;
+
+      const insetX = Math.min(18, Math.max(10, btnRect.width * 0.06));
+      const insetY = Math.min(12, Math.max(6, btnRect.height * 0.16));
+
+      wordElements.forEach(wordEl => {
+        const rect = wordEl.getBoundingClientRect();
+        const desiredX = Number(wordEl.dataset.baseX || 0);
+        const desiredY = Number(wordEl.dataset.baseY || 0);
+        const maxLeft = Math.max(0, rect.left - btnRect.left - insetX);
+        const maxRight = Math.max(0, btnRect.right - rect.right - insetX);
+        const maxUp = Math.max(0, rect.top - btnRect.top - insetY);
+        const maxDown = Math.max(0, btnRect.bottom - rect.bottom - insetY);
+        const resolvedX = clamp(desiredX, -maxLeft, maxRight);
+        const resolvedY = clamp(desiredY, -maxUp, maxDown);
+
+        wordEl.style.setProperty('--word-x', `${resolvedX}px`);
+        wordEl.style.setProperty('--word-y', `${resolvedY}px`);
+      });
+    };
+
+    const buildShards = () => {
+      const rect = btn.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const nextLayoutKey = `${Math.round(rect.width)}x${Math.round(rect.height)}`;
+      if (layoutKey === nextLayoutKey && shardsContainer.childElementCount) return;
+
+      layoutKey = nextLayoutKey;
+      shardsContainer.innerHTML = '';
+
+      const SHARDS = 35;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      for (let i = 0; i < SHARDS; i++) {
+        const shard = document.createElement('div');
+        shard.className = 'shard-piece';
+
+        const startX = Math.random() * rect.width;
+        const startY = Math.random() * rect.height;
+        const dx = startX - centerX;
+        const dy = startY - centerY;
+        const dist = Math.hypot(dx, dy) || 1;
+        const spread = 24 + Math.random() * 42 + dist * 0.16;
+        const pushX = (dx / dist) * spread + (Math.random() - 0.5) * 18;
+        const pushY = (dy / dist) * spread + (Math.random() - 0.5) * 18;
+        const pushZ = Math.random() * 110 + 16;
+        const rotX = (Math.random() - 0.5) * 260;
+        const rotY = (Math.random() - 0.5) * 260;
+        const size = Math.random() * 12 + 5;
+
+        shard.style.left = `${startX}px`;
+        shard.style.top = `${startY}px`;
+        shard.style.width = `${size}px`;
+        shard.style.height = `${size}px`;
+        shard.style.setProperty('--target-x', `${pushX}px`);
+        shard.style.setProperty('--target-y', `${pushY}px`);
+        shard.style.setProperty('--target-z', `${pushZ}px`);
+        shard.style.setProperty('--target-rx', `${rotX}deg`);
+        shard.style.setProperty('--target-ry', `${rotY}deg`);
+
+        shardsContainer.appendChild(shard);
+      }
+    };
+
+    const setProgress = (value) => {
+      const nextProgress = clamp(value, 0, 1);
+      btn.style.setProperty('--shatter-progress', nextProgress.toFixed(4));
+      btn.style.setProperty('--shatter-flight-progress', Math.pow(nextProgress, 1.45).toFixed(4));
+    };
+
+    const tick = () => {
+      currentProgress += (targetProgress - currentProgress) * 0.2;
+
+      if (Math.abs(targetProgress - currentProgress) < 0.001) {
+        currentProgress = targetProgress;
+      }
+
+      setProgress(currentProgress);
+
+      if (Math.abs(targetProgress - currentProgress) >= 0.001 || currentProgress > 0.001) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        rafId = 0;
+      }
+    };
+
+    const ensureTick = () => {
+      if (!rafId) {
+        rafId = requestAnimationFrame(tick);
+      }
+    };
+
+    const resolvePointerProgress = (event) => {
+      const rect = btn.getBoundingClientRect();
+      if (!rect.width || !rect.height) return 0;
+
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const nx = (x - rect.width / 2) / (rect.width / 2);
+      const ny = (y - rect.height / 2) / (rect.height / 2);
+      const radialDistance = Math.sqrt((nx * nx) + (ny * ny));
+      const edgeToCenterProgress = clamp(1 - radialDistance, 0, 1);
+
+      return Math.pow(edgeToCenterProgress, 0.8);
+    };
+
+    const updateFromPointer = (event) => {
+      buildShards();
+      targetProgress = resolvePointerProgress(event);
+      ensureTick();
+    };
+
+    btn.addEventListener('pointerenter', updateFromPointer);
+    btn.addEventListener('pointermove', updateFromPointer);
+    btn.addEventListener('pointerleave', () => {
+      targetProgress = 0;
+      ensureTick();
+    });
+
+    btn.addEventListener('focus', () => {
+      buildShards();
+      targetProgress = 1;
+      ensureTick();
+    });
+
+    btn.addEventListener('blur', () => {
+      targetProgress = 0;
+      ensureTick();
+    });
+
+    window.addEventListener('resize', () => {
+      layoutKey = '';
+      calibrateWordMotion();
+      buildShards();
+      setProgress(currentProgress);
+    });
+
+    calibrateWordMotion();
+    setProgress(0);
+  });
+})();
+
+// --- Bubble Points Interaction ---
+(function initBubblePointsInteraction() {
+  const shell = document.querySelector(".bubble-points-shell");
+  const centerCard = shell?.querySelector(".bubble-center");
+  const nodes = shell ? Array.from(shell.querySelectorAll(".bubble-node")) : [];
+
+  if (!shell || !centerCard || !nodes.length) return;
+
+  const finePointerQuery = window.matchMedia("(pointer: fine)");
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (!finePointerQuery.matches || reducedMotionQuery.matches) return;
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const round = (value) => value.toFixed(4);
+  const normalizeVector = (x, y) => {
+    const length = Math.hypot(x, y) || 1;
+
+    return { x: x / length, y: y / length };
+  };
+
+  let currentCenterScale = 1;
+  let targetCenterScale = 1;
+  let currentDepth = 0;
+  let targetDepth = 0;
+  let currentWarmth = 0;
+  let targetWarmth = 0;
+  let currentCenterFill = 0;
+  let targetCenterFill = 0;
+  let currentBorderWidth = 2;
+  let targetBorderWidth = 2;
+  let currentNodeWarmth = 0;
+  let targetNodeWarmth = 0;
+  const nodeState = nodes.map(() => ({ scale: 1, targetScale: 1, x: 0, targetX: 0, y: 0, targetY: 0 }));
+  let rafId = 0;
+
+  const setVars = () => {
+    shell.style.setProperty("--bubble-center-scale", round(currentCenterScale));
+    shell.style.setProperty("--bubble-interaction-depth", round(currentDepth));
+    shell.style.setProperty("--bubble-shell-warmth", round(currentWarmth));
+    shell.style.setProperty("--bubble-center-fill-strength", round(currentCenterFill));
+    shell.style.setProperty("--bubble-center-border-width", `${currentBorderWidth.toFixed(2)}px`);
+    shell.style.setProperty("--bubble-node-warmth", round(currentNodeWarmth));
+
+    nodes.forEach((node, index) => {
+      const state = nodeState[index];
+      node.style.setProperty("--bubble-node-scale", round(state.scale));
+      node.style.setProperty("--bubble-node-translate-x", `${state.x.toFixed(2)}px`);
+      node.style.setProperty("--bubble-node-translate-y", `${state.y.toFixed(2)}px`);
+    });
+  };
+
+  const resolveNodeRange = (shellRect) => {
+    if (shellRect.width < 860) return { minScale: 0.95, maxScale: 1.005, drift: 14 };
+    if (shellRect.width < 1080) return { minScale: 0.935, maxScale: 1.01, drift: 18 };
+    if (shellRect.width < 1320) return { minScale: 0.92, maxScale: 1.015, drift: 24 };
+
+    return { minScale: 0.91, maxScale: 1.02, drift: 28 };
+  };
+
+  const ensureTick = () => {
+    if (!rafId) {
+      rafId = requestAnimationFrame(tick);
+    }
+  };
+
+  const tick = () => {
+    currentCenterScale += (targetCenterScale - currentCenterScale) * 0.13;
+    currentDepth += (targetDepth - currentDepth) * 0.11;
+    currentWarmth += (targetWarmth - currentWarmth) * 0.11;
+    currentCenterFill += (targetCenterFill - currentCenterFill) * 0.12;
+    currentBorderWidth += (targetBorderWidth - currentBorderWidth) * 0.14;
+    currentNodeWarmth += (targetNodeWarmth - currentNodeWarmth) * 0.12;
+
+    if (Math.abs(targetCenterScale - currentCenterScale) < 0.0005) currentCenterScale = targetCenterScale;
+    if (Math.abs(targetDepth - currentDepth) < 0.0005) currentDepth = targetDepth;
+    if (Math.abs(targetWarmth - currentWarmth) < 0.0005) currentWarmth = targetWarmth;
+    if (Math.abs(targetCenterFill - currentCenterFill) < 0.0005) currentCenterFill = targetCenterFill;
+    if (Math.abs(targetBorderWidth - currentBorderWidth) < 0.01) currentBorderWidth = targetBorderWidth;
+    if (Math.abs(targetNodeWarmth - currentNodeWarmth) < 0.0005) currentNodeWarmth = targetNodeWarmth;
+
+    nodeState.forEach((state) => {
+      state.scale += (state.targetScale - state.scale) * 0.12;
+      state.x += (state.targetX - state.x) * 0.12;
+      state.y += (state.targetY - state.y) * 0.12;
+
+      if (Math.abs(state.targetScale - state.scale) < 0.0005) state.scale = state.targetScale;
+      if (Math.abs(state.targetX - state.x) < 0.01) state.x = state.targetX;
+      if (Math.abs(state.targetY - state.y) < 0.01) state.y = state.targetY;
+    });
+
+    setVars();
+
+    if (
+      Math.abs(targetCenterScale - currentCenterScale) >= 0.0005 ||
+      Math.abs(targetDepth - currentDepth) >= 0.0005 ||
+      Math.abs(targetWarmth - currentWarmth) >= 0.0005 ||
+      Math.abs(targetCenterFill - currentCenterFill) >= 0.0005 ||
+      Math.abs(targetBorderWidth - currentBorderWidth) >= 0.01 ||
+      Math.abs(targetNodeWarmth - currentNodeWarmth) >= 0.0005 ||
+      nodeState.some((state) =>
+        Math.abs(state.targetScale - state.scale) >= 0.0005 ||
+        Math.abs(state.targetX - state.x) >= 0.01 ||
+        Math.abs(state.targetY - state.y) >= 0.01
+      )
+    ) {
+      rafId = requestAnimationFrame(tick);
+    } else {
+      rafId = 0;
+    }
+  };
+
+  const updateTargets = (clientX, clientY) => {
+    const shellRect = shell.getBoundingClientRect();
+    const centerRect = centerCard.getBoundingClientRect();
+    if (!shellRect.width || !shellRect.height || !centerRect.width || !centerRect.height) return;
+
+    const centerX = centerRect.left + (centerRect.width / 2);
+    const centerY = centerRect.top + (centerRect.height / 2);
+    const distance = Math.hypot(clientX - centerX, clientY - centerY);
+    const influenceRadius = clamp(Math.hypot(shellRect.width, shellRect.height) * 0.34, 240, 430);
+    const distanceRatio = clamp(distance / influenceRadius, 0, 1);
+    const centerEase = Math.pow(1 - distanceRatio, 1.45);
+    const outerEase = Math.pow(distanceRatio, 1.05);
+    const nodeRange = resolveNodeRange(shellRect);
+
+    targetCenterScale = 1 + (0.115 * centerEase);
+    targetDepth = 0.12 + (0.96 * centerEase);
+    targetWarmth = centerEase;
+    targetCenterFill = centerEase;
+    targetBorderWidth = 2 + (2.4 * centerEase);
+    targetNodeWarmth = centerEase;
+    shell.style.setProperty("--bubble-focus-x", `${(((clientX - shellRect.left) / shellRect.width) * 100).toFixed(2)}%`);
+    shell.style.setProperty("--bubble-focus-y", `${(((clientY - shellRect.top) / shellRect.height) * 100).toFixed(2)}%`);
+
+    nodes.forEach((node, index) => {
+      const rect = node.getBoundingClientRect();
+      const nodeCenterX = rect.left + (rect.width / 2);
+      const nodeCenterY = rect.top + (rect.height / 2);
+      const direction = normalizeVector(nodeCenterX - centerX, nodeCenterY - centerY);
+      const state = nodeState[index];
+      const outwardDrift = nodeRange.drift * centerEase;
+      const tangentBias = index === 0 ? 0 : ((index % 2 === 0 ? 1 : -1) * 2.5 * centerEase);
+
+      state.targetScale = nodeRange.minScale + ((nodeRange.maxScale - nodeRange.minScale) * outerEase);
+      state.targetX = direction.x * outwardDrift;
+      state.targetY = (direction.y * outwardDrift) + tangentBias;
+    });
+
+    ensureTick();
+  };
+
+  const resetTargets = () => {
+    targetCenterScale = 1;
+    targetDepth = 0;
+    targetWarmth = 0;
+    targetCenterFill = 0;
+    targetBorderWidth = 2;
+    targetNodeWarmth = 0;
+    shell.style.setProperty("--bubble-focus-x", "50%");
+    shell.style.setProperty("--bubble-focus-y", "50%");
+
+    nodeState.forEach((state) => {
+      state.targetScale = 1;
+      state.targetX = 0;
+      state.targetY = 0;
+    });
+
+    ensureTick();
+  };
+
+  shell.addEventListener("pointerenter", (event) => updateTargets(event.clientX, event.clientY));
+  shell.addEventListener("pointermove", (event) => updateTargets(event.clientX, event.clientY));
+  shell.addEventListener("pointerleave", resetTargets);
+  window.addEventListener("blur", resetTargets);
+
+  setVars();
+})();
+
