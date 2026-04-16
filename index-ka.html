@@ -40,6 +40,7 @@
         <div class="header-shell">
           <a class="brand" href="index-ka.html" aria-label="Tbilisi Growth Studio მთავარი გვერდი">
             <img class="brand-icon" src="logo.png" alt="Tbilisi Growth Studio ლოგოს აიკონი">
+            <span class="sr-only">Tbilisi Growth Studio</span>
           </a>
           <nav class="site-nav" aria-label="მთავარი">
             <ul class="nav-list">
@@ -183,7 +184,14 @@
                <p class="lead" style="margin: 0 auto;">დაგვიტოვეთ დეტალები ქვემოთ. ხელით გადავხედავთ თქვენს მიმდინარე ციფრულ პრეზენტაციას და ზუსტად გეტყვით, რა გაკარგვინებთ ფულს და როგორ შეიძლება გამოსწორება.</p>
             </div>
             
-            <form class="contact-form reveal" style="padding: 3rem; background: #ffffff; border-radius: 28px; box-shadow: var(--shadow); border: 1px solid var(--border);" id="inquiry-form" action="/api/contact" method="post">
+            <form class="contact-form reveal" data-contact-form style="padding: 3rem; background: #ffffff; border-radius: 28px; box-shadow: var(--shadow); border: 1px solid var(--border);" id="inquiry-form" action="/api/contact" method="post">
+               <div class="success-banner" data-form-success aria-live="polite"></div>
+               <input name="page" type="hidden" value="index-ka.html">
+               <input name="language" type="hidden" value="ka">
+               <div class="field field-hidden" aria-hidden="true">
+                 <label for="website-home-ka">Website</label>
+                 <input id="website-home-ka" name="website" type="text" tabindex="-1" autocomplete="off">
+               </div>
                <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                   <div class="field">
                     <label for="fname" style="display:block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem;">სახელი</label>
@@ -241,6 +249,7 @@
           <div>
             <a class="brand" href="index-ka.html">
               <img class="brand-lockup" src="Logo_withtext.png" alt="Tbilisi Growth Studio ლოგო ტექსტით" style="max-height: 48px; filter: brightness(0.2);">
+              <span class="sr-only">Tbilisi Growth Studio</span>
             </a>
             <p style="margin-top: 1rem; max-width: 300px; font-size: 0.95rem;">ვებსაიტები, სოციალური მედიის სისტემები და უფრო გამართული საკონტაქტო გზები თბილისური ბიზნესებისთვის.</p>
           </div>

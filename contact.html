@@ -19,6 +19,7 @@
         <div class="header-shell">
           <a class="brand" href="index.html" aria-label="Tbilisi Growth Studio home">
             <img class="brand-icon" src="logo.png" alt="Tbilisi Growth Studio logo icon">
+            <span class="sr-only">Tbilisi Growth Studio</span>
           </a>
           <nav class="site-nav" aria-label="Primary">
             <ul class="nav-list">
@@ -52,14 +53,14 @@
         <div class="container hero-grid">
           <div class="hero-copy reveal">
             <span class="eyebrow">Contact us</span>
-            <h1>Tell us about your business and what you need.</h1>
+            <h1>Choose the easiest one-tap way to reach us.</h1>
             <p class="lead">
-              If you need a website, stronger social presentation, cleaner branding, or a better inquiry path,
-              send the basics and we will point you in the right direction.
+              If you need a sharper website, stronger brand presentation, or a cleaner inquiry route, send the basics and
+              we will tell you what to fix first.
             </p>
             <div class="button-group">
-              <a class="button button-primary" href="https://wa.me/995597199500" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>
-              <a class="button button-secondary" href="mailto:tbilisigrowthstudio@gmail.com">Email Us</a>
+              <a class="button button-primary" href="#contact-form">Book Free Audit</a>
+              <a class="button button-secondary" href="https://wa.me/995597199500" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>
             </div>
           </div>
           <div class="panel reveal">
@@ -69,17 +70,17 @@
               <a class="contact-method" href="https://wa.me/995597199500" target="_blank" rel="noopener noreferrer">
                 <strong>WhatsApp</strong>
                 <p>Best for quick questions, screenshots, and fast back-and-forth.</p>
-                <span>Open chat</span>
+                <span>Open WhatsApp chat</span>
               </a>
               <a class="contact-method" href="mailto:tbilisigrowthstudio@gmail.com">
                 <strong>Email</strong>
                 <p>Best for detailed project notes, references, files, and partnership requests.</p>
-                <span>Write email</span>
+                <span>Email tbilisigrowthstudio@gmail.com</span>
               </a>
               <a class="contact-method" href="tel:+995597199500">
                 <strong>Call</strong>
                 <p>Best when you want immediate clarity on priorities and next steps.</p>
-                <span>Tap to call</span>
+                <span>Call +995 597 19 95 00</span>
               </a>
             </div>
             <p class="contact-response">Response time is usually within one business day.</p>
@@ -89,18 +90,18 @@
 
       <section class="section">
         <div class="container contact-layout">
-          <form class="contact-form reveal" id="contact-form" action="/api/contact" method="post">
+          <form class="contact-form reveal" data-contact-form id="contact-form" action="/api/contact" method="post">
             <div class="section-heading" style="margin-bottom: 0;">
               <span class="eyebrow">Project form</span>
               <h2>Short form, fast reply.</h2>
-              <p>Tell us enough to understand the business and the service you need. Your submission is stored securely so we can track and reply properly.</p>
+              <p>Tell us enough to understand the business and the main blockage. Your submission goes through our server-side form handler so we can track and reply properly.</p>
             </div>
 
-            <div class="success-banner" id="form-success" aria-live="polite"></div>
+            <div class="success-banner" id="form-success" data-form-success aria-live="polite"></div>
 
             <div class="helper-note">
               <strong>No long intake form needed.</strong>
-              <p>A link to your website or Instagram plus a short note about what feels weak is enough for the first review.</p>
+              <p>The fastest first message includes a website or Instagram link plus one sentence on what currently feels weak.</p>
             </div>
 
             <input name="page" type="hidden" value="contact.html">
@@ -147,8 +148,8 @@
             </p>
 
             <div class="button-group">
-              <button class="button button-primary" type="submit">Send Request</button>
-              <a class="button button-secondary" href="https://wa.me/995597199500" target="_blank" rel="noopener noreferrer">WhatsApp instead</a>
+              <button class="button button-primary" type="submit">Book Free Audit</button>
+              <a class="button button-secondary" href="https://wa.me/995597199500" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>
             </div>
           </form>
 
@@ -156,7 +157,7 @@
             <article class="contact-card reveal">
               <span class="eyebrow">Best starting point</span>
               <h3>Book a free audit</h3>
-              <p>If you are unsure what needs to change first, we can review your current website, social page, and contact flow.</p>
+              <p>If you are unsure what needs to change first, we can review your current website, social page, and response flow.</p>
               <ul class="check-list">
                 <li>What looks weak right now</li>
                 <li>What to prioritize first</li>
@@ -169,7 +170,7 @@
               <h3>Tbilisi, Georgia</h3>
               <p>Flexible service for local businesses. Most meetings can happen through WhatsApp, phone, email, or a short video call.</p>
               <div class="button-group" style="margin-top: 1rem;">
-                <a class="button button-secondary" href="tel:+995597199500">Tap to call</a>
+                <a class="button button-secondary" href="tel:+995597199500">Call +995 597 19 95 00</a>
                 <a class="button button-secondary" href="https://www.instagram.com/tbilisigrowthstudio?igsh=N2ViYnp4cmRxdHF6" target="_blank" rel="noopener noreferrer">Instagram</a>
               </div>
             </article>
@@ -216,8 +217,9 @@
           <div>
             <a class="brand" href="index.html">
               <img class="brand-lockup" src="Logo_withtext.png" alt="Tbilisi Growth Studio logo with text">
+              <span class="sr-only">Tbilisi Growth Studio</span>
             </a>
-            <p style="margin-top: 1rem;">Websites, social media systems, and clearer contact paths for businesses in Tbilisi, Georgia.</p>
+            <p style="margin-top: 1rem;">Websites, social systems, and clearer booking routes for businesses in Tbilisi, Georgia.</p>
           </div>
           <div class="footer-nav">
             <span class="footer-title">Pages</span>
@@ -241,7 +243,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <span>&copy; <span data-year></span> Tbilisi Growth Studio. All rights reserved.</span>
+          <span>&copy; <span data-year>2026</span> Tbilisi Growth Studio. All rights reserved.</span>
           <span>Website design Tbilisi | Social media management Tbilisi | Contact local digital agency</span>
         </div>
       </div>
