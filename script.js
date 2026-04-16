@@ -1015,7 +1015,7 @@ if (contactForm) {
 
       trimResolve.style.strokeDasharray = `${resolveLength.toFixed(2)} 140`;
       trimResolve.style.strokeDashoffset = `${trimStart.toFixed(2)}`;
-      trimResolve.style.opacity = `${Math.min(0.96, 0.18 + (progress * 0.92)).toFixed(3)}`;
+      trimResolve.style.opacity = `${Math.min(0.96, progress * 0.96).toFixed(3)}`;
 
       trimFull.style.opacity = `${fullOpacity.toFixed(3)}`;
     };
