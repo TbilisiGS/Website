@@ -866,89 +866,128 @@ if (contactForm) {
 })();
 
 // --- Dynamic CTA Hover Tracking ---
-(function initShatterButtons() {
-  const shatterButtons = document.querySelectorAll(".button-primary, .promo-popup-button-primary");
-  if (!shatterButtons.length) return;
+(function initDynamicButtons() {
+  const dynamicButtons = Array.from(document.querySelectorAll(".button-primary, .promo-popup-button-primary"));
+  if (!dynamicButtons.length) return;
 
   const finePointerQuery = window.matchMedia("(pointer: fine)");
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-  const normalizeVector = (x, y) => {
-    const length = Math.hypot(x, y) || 1;
+  const svgNamespace = "http://www.w3.org/2000/svg";
 
-    return { x: x / length, y: y / length, length };
+  const createGradientStop = (offset, color, opacity = "1") => {
+    const stop = document.createElementNS(svgNamespace, "stop");
+    stop.setAttribute("offset", offset);
+    stop.setAttribute("stop-color", color);
+    stop.setAttribute("stop-opacity", opacity);
+
+    return stop;
   };
-  const seededUnit = (seed) => {
-    const value = Math.sin(seed * 12.9898) * 43758.5453;
 
-    return value - Math.floor(value);
-  };
-  const resolveEscapeVector = (impactX, impactY, pointerX, pointerY) => {
-    const mixedImpactX = (impactX * 0.78) + (pointerX * 0.22);
-    const mixedImpactY = (impactY * 0.78) + (pointerY * 0.22);
-    const strength = Math.min(Math.hypot(mixedImpactX, mixedImpactY), 1.15);
+  const createStrokeRect = (className, strokeWidth, strokeValue) => {
+    const rect = document.createElementNS(svgNamespace, "rect");
+    rect.setAttribute("class", className);
+    rect.setAttribute("x", "1.7");
+    rect.setAttribute("y", "1.7");
+    rect.setAttribute("width", "96.6");
+    rect.setAttribute("height", "96.6");
+    rect.setAttribute("rx", "48.3");
+    rect.setAttribute("ry", "48.3");
+    rect.setAttribute("pathLength", "100");
+    rect.setAttribute("fill", "none");
+    rect.setAttribute("stroke-width", strokeWidth);
+    rect.setAttribute("stroke-linecap", "round");
+    rect.setAttribute("stroke-linejoin", "round");
 
-    if (strength < 0.04) {
-      return { x: 0, y: 0, strength: 0, angle: 0 };
+    if (strokeValue) {
+      rect.setAttribute("stroke", strokeValue);
     }
 
-    const escape = normalizeVector(-mixedImpactX, -mixedImpactY);
-
-    return {
-      x: escape.x,
-      y: escape.y,
-      strength,
-      angle: Math.atan2(escape.y, escape.x)
-    };
+    return rect;
   };
 
-  shatterButtons.forEach((btn, buttonIndex) => {
-    if (!btn.querySelector(".shatter-text-layer")) {
-      const textLayer = document.createElement("span");
-      textLayer.className = "shatter-text-layer";
+  const resolveTrimStart = (localX, localY, width, height) => {
+    const distances = [
+      { side: "top", distance: localY },
+      { side: "right", distance: width - localX },
+      { side: "bottom", distance: height - localY },
+      { side: "left", distance: localX }
+    ].sort((left, right) => left.distance - right.distance);
+
+    switch (distances[0].side) {
+      case "top":
+        return clamp((localX / width) * 25, 0, 25);
+      case "right":
+        return 25 + clamp((localY / height) * 25, 0, 25);
+      case "bottom":
+        return 50 + clamp(((width - localX) / width) * 25, 0, 25);
+      default:
+        return 75 + clamp(((height - localY) / height) * 25, 0, 25);
+    }
+  };
+
+  dynamicButtons.forEach((btn, buttonIndex) => {
+    btn.classList.add("dynamic-button");
+
+    if (!btn.querySelector(".dynamic-button-label")) {
+      const label = document.createElement("span");
+      label.className = "dynamic-button-label";
 
       while (btn.firstChild) {
-        textLayer.appendChild(btn.firstChild);
+        label.appendChild(btn.firstChild);
       }
 
-      btn.appendChild(textLayer);
+      btn.appendChild(label);
     }
 
-    const textLayer = btn.querySelector(".shatter-text-layer");
+    let trimStroke = btn.querySelector(".dynamic-button-stroke");
+    let trimEcho;
+    let trimResolve;
+    let trimFull;
 
-    if (textLayer && !textLayer.querySelector(".shatter-word-set")) {
-      const labelText = textLayer.textContent.replace(/\s+/g, " ").trim();
-      const wordsWrap = document.createElement("span");
-      const words = labelText ? labelText.split(" ") : [""];
-      const midpoint = (words.length - 1) / 2;
+    if (!trimStroke) {
+      const trimGradientId = `dynamic-button-trim-${buttonIndex + 1}`;
+      const defs = document.createElementNS(svgNamespace, "defs");
+      const trimGradient = document.createElementNS(svgNamespace, "linearGradient");
 
-      wordsWrap.className = "shatter-word-set";
-      textLayer.textContent = "";
+      trimStroke = document.createElementNS(svgNamespace, "svg");
+      trimStroke.setAttribute("class", "dynamic-button-stroke");
+      trimStroke.setAttribute("viewBox", "0 0 100 100");
+      trimStroke.setAttribute("preserveAspectRatio", "none");
+      trimStroke.setAttribute("aria-hidden", "true");
 
-      words.forEach((word, index) => {
-        const wordEl = document.createElement("span");
-        const distanceFromCenter = index - midpoint;
-        const direction = distanceFromCenter === 0 ? (index % 2 === 0 ? -1 : 1) : Math.sign(distanceFromCenter);
-        const magnitude = Math.abs(distanceFromCenter);
+      trimGradient.setAttribute("id", trimGradientId);
+      trimGradient.setAttribute("x1", "0%");
+      trimGradient.setAttribute("y1", "0%");
+      trimGradient.setAttribute("x2", "100%");
+      trimGradient.setAttribute("y2", "0%");
+      trimGradient.append(
+        createGradientStop("0%", "#c58b2c", "0.95"),
+        createGradientStop("22%", "#efd39a", "1"),
+        createGradientStop("52%", "#fff9ea", "1"),
+        createGradientStop("78%", "#e1b458", "0.96"),
+        createGradientStop("100%", "#b97a1e", "0.92")
+      );
 
-        wordEl.className = "shatter-word";
-        wordEl.textContent = word;
-        wordEl.style.setProperty("--word-x", `${(direction * (6 + (magnitude * 4))) + (distanceFromCenter * 2)}px`);
-        wordEl.style.setProperty("--word-y", `${(index % 2 === 0 ? -1 : 1) * (2.8 + (magnitude * 2.2))}px`);
-        wordEl.style.setProperty("--word-rotate", `${direction * (2.6 + (magnitude * 1.9))}deg`);
+      defs.appendChild(trimGradient);
+      trimStroke.appendChild(defs);
 
-        wordsWrap.appendChild(wordEl);
-      });
+      trimEcho = createStrokeRect("dynamic-button-stroke-echo", "2.5", `url(#${trimGradientId})`);
+      trimResolve = createStrokeRect("dynamic-button-stroke-resolve", "1.45", `url(#${trimGradientId})`);
+      trimFull = createStrokeRect("dynamic-button-stroke-full", "1.05", `url(#${trimGradientId})`);
 
-      textLayer.appendChild(wordsWrap);
-    }
+      trimStroke.append(
+        createStrokeRect("dynamic-button-stroke-track", "0.9"),
+        trimEcho,
+        trimResolve,
+        trimFull
+      );
 
-    let fragmentsContainer = btn.querySelector(".shatter-fragments");
-
-    if (!fragmentsContainer) {
-      fragmentsContainer = document.createElement("span");
-      fragmentsContainer.className = "shatter-fragments";
-      btn.insertBefore(fragmentsContainer, textLayer);
+      btn.insertBefore(trimStroke, btn.firstChild);
+    } else {
+      trimEcho = trimStroke.querySelector(".dynamic-button-stroke-echo");
+      trimResolve = trimStroke.querySelector(".dynamic-button-stroke-resolve");
+      trimFull = trimStroke.querySelector(".dynamic-button-stroke-full");
     }
 
     const currentState = {
@@ -957,115 +996,28 @@ if (contactForm) {
       y: 50,
       tiltX: 0,
       tiltY: 0,
-      sheenShift: -20,
-      driftX: 0,
-      driftY: 0,
-      impactX: 0,
-      impactY: 0,
-      pointerX: 0,
-      pointerY: 0
+      sheenShift: -18,
+      trimStart: 12
     };
-
     const targetState = { ...currentState };
-    const fragmentMeta = [];
     let rafId = 0;
-    let layoutKey = "";
 
-    const buildFragments = () => {
-      const rect = btn.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
+    const applyTrimStroke = () => {
+      const progress = currentState.progress;
+      const trimStart = 100 - currentState.trimStart;
+      const echoLength = 12 + (progress * 56);
+      const resolveLength = 10 + (progress * 108);
+      const fullOpacity = Math.pow(progress, 1.7) * 0.88;
 
-      const nextLayoutKey = `${Math.round(rect.width)}x${Math.round(rect.height)}`;
-      if (nextLayoutKey === layoutKey && fragmentMeta.length) return;
+      trimEcho.style.strokeDasharray = `${echoLength.toFixed(2)} 140`;
+      trimEcho.style.strokeDashoffset = `${(trimStart - (progress * 8)).toFixed(2)}`;
+      trimEcho.style.opacity = `${(progress * 0.55).toFixed(3)}`;
 
-      layoutKey = nextLayoutKey;
-      fragmentMeta.length = 0;
-      fragmentsContainer.innerHTML = "";
+      trimResolve.style.strokeDasharray = `${resolveLength.toFixed(2)} 140`;
+      trimResolve.style.strokeDashoffset = `${trimStart.toFixed(2)}`;
+      trimResolve.style.opacity = `${Math.min(0.96, 0.18 + (progress * 0.92)).toFixed(3)}`;
 
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const orbitX = (rect.width / 2) + 10;
-      const orbitY = (rect.height / 2) + 8;
-      const fragmentCount = Math.round(clamp(rect.width / 9, 16, 24));
-
-      for (let index = 0; index < fragmentCount; index += 1) {
-        const seed = ((buttonIndex + 1) * 97) + index + 1;
-        const radialNoise = seededUnit(seed + 0.17);
-        const heightNoise = seededUnit(seed + 0.37);
-        const driftNoise = seededUnit(seed + 0.61);
-        const spinNoise = seededUnit(seed + 0.83);
-        const opacityNoise = seededUnit(seed + 1.09);
-        const theta = ((index / fragmentCount) * Math.PI * 2) - (Math.PI / 2);
-        const orbitOffset = (radialNoise - 0.5) * 10;
-        const originX = centerX + (Math.cos(theta) * (orbitX + orbitOffset));
-        const originY = centerY + (Math.sin(theta) * (orbitY + (orbitOffset * 0.6)));
-        const size = 8 + (radialNoise * 10);
-        const fragment = document.createElement("span");
-
-        fragment.className = "shatter-fragment";
-        fragment.style.left = `${originX.toFixed(2)}px`;
-        fragment.style.top = `${originY.toFixed(2)}px`;
-        fragment.style.width = `${size.toFixed(2)}px`;
-        fragment.style.height = `${(size * (0.72 + (heightNoise * 0.42))).toFixed(2)}px`;
-
-        fragmentsContainer.appendChild(fragment);
-        fragmentMeta.push({
-          element: fragment,
-          angle: theta,
-          burst: 20 + (radialNoise * 28),
-          drift: -8 + (driftNoise * 16),
-          spin: -95 + (spinNoise * 190),
-          scale: 0.54 + (heightNoise * 0.82),
-          opacity: 0.36 + (opacityNoise * 0.46)
-        });
-      }
-    };
-
-    const updateFragments = (nx = 0, ny = 0, impactX = nx, impactY = ny) => {
-      const pointerStrength = Math.min(Math.hypot(nx, ny), 1.15);
-      const escapeVector = resolveEscapeVector(impactX, impactY, nx, ny);
-      const sweepVector = pointerStrength < 0.04
-        ? normalizeVector(-escapeVector.y || 0.001, escapeVector.x || 0.001)
-        : normalizeVector(-ny, nx);
-
-      fragmentMeta.forEach((fragment, index) => {
-        const oppositeBias = escapeVector.strength < 0.04
-          ? 0.72
-          : clamp((Math.cos(fragment.angle - escapeVector.angle) + 1) / 2, 0.08, 1);
-        const impactBias = escapeVector.strength < 0.04
-          ? 0.24
-          : clamp((Math.cos(fragment.angle - (escapeVector.angle + Math.PI)) + 1) / 2, 0, 1);
-        const outward = fragment.burst * (0.34 + (oppositeBias * 1.5));
-        const tangentX = -Math.sin(fragment.angle);
-        const tangentY = Math.cos(fragment.angle);
-        const globalEscape = escapeVector.strength < 0.04 ? 0 : 10 + (escapeVector.strength * 18);
-        const sweep = pointerStrength < 0.04 ? 0 : 4 + (pointerStrength * 9);
-        const escapePush = globalEscape * (0.52 + (oppositeBias * 0.94));
-        const recoilDrag = 2 + (impactBias * 8);
-        const spinBias = (index % 2 === 0 ? 1 : -1) * (
-          (escapeVector.x * 58) +
-          (escapeVector.y * 38) +
-          (pointerStrength * 16)
-        );
-        const x =
-          (Math.cos(fragment.angle) * outward) +
-          (tangentX * fragment.drift) +
-          (sweepVector.x * sweep * (0.18 + (oppositeBias * 0.34))) +
-          (escapeVector.x * escapePush) -
-          (Math.cos(fragment.angle) * recoilDrag * impactBias);
-        const y =
-          (Math.sin(fragment.angle) * outward) +
-          (tangentY * fragment.drift) +
-          (sweepVector.y * sweep * (0.18 + (oppositeBias * 0.34))) +
-          (escapeVector.y * escapePush) -
-          (Math.sin(fragment.angle) * recoilDrag * impactBias);
-
-        fragment.element.style.setProperty("--fragment-x", `${x.toFixed(2)}px`);
-        fragment.element.style.setProperty("--fragment-y", `${y.toFixed(2)}px`);
-        fragment.element.style.setProperty("--fragment-rotate", `${(fragment.spin + spinBias).toFixed(2)}deg`);
-        fragment.element.style.setProperty("--fragment-scale", `${(fragment.scale * (0.84 + (oppositeBias * 0.28))).toFixed(3)}`);
-        fragment.element.style.setProperty("--fragment-opacity", `${(fragment.opacity * (0.4 + (oppositeBias * 0.86)) * (1 - (impactBias * 0.12))).toFixed(3)}`);
-      });
+      trimFull.style.opacity = `${fullOpacity.toFixed(3)}`;
     };
 
     const applyState = () => {
@@ -1075,19 +1027,18 @@ if (contactForm) {
       btn.style.setProperty("--tilt-x", `${currentState.tiltX.toFixed(2)}deg`);
       btn.style.setProperty("--tilt-y", `${currentState.tiltY.toFixed(2)}deg`);
       btn.style.setProperty("--sheen-shift", `${currentState.sheenShift.toFixed(2)}%`);
-      btn.style.setProperty("--shatter-drift-x", `${currentState.driftX.toFixed(2)}px`);
-      btn.style.setProperty("--shatter-drift-y", `${currentState.driftY.toFixed(2)}px`);
+      btn.style.setProperty("--trim-start", `${currentState.trimStart.toFixed(2)}px`);
+      applyTrimStroke();
     };
 
     const tick = () => {
-      currentState.progress += (targetState.progress - currentState.progress) * 0.16;
+      currentState.progress += (targetState.progress - currentState.progress) * 0.15;
       currentState.x += (targetState.x - currentState.x) * 0.18;
       currentState.y += (targetState.y - currentState.y) * 0.18;
       currentState.tiltX += (targetState.tiltX - currentState.tiltX) * 0.14;
       currentState.tiltY += (targetState.tiltY - currentState.tiltY) * 0.14;
-      currentState.sheenShift += (targetState.sheenShift - currentState.sheenShift) * 0.16;
-      currentState.driftX += (targetState.driftX - currentState.driftX) * 0.18;
-      currentState.driftY += (targetState.driftY - currentState.driftY) * 0.18;
+      currentState.sheenShift += (targetState.sheenShift - currentState.sheenShift) * 0.15;
+      currentState.trimStart += (targetState.trimStart - currentState.trimStart) * 0.16;
 
       const isSettled =
         Math.abs(targetState.progress - currentState.progress) < 0.001 &&
@@ -1096,17 +1047,16 @@ if (contactForm) {
         Math.abs(targetState.tiltX - currentState.tiltX) < 0.01 &&
         Math.abs(targetState.tiltY - currentState.tiltY) < 0.01 &&
         Math.abs(targetState.sheenShift - currentState.sheenShift) < 0.01 &&
-        Math.abs(targetState.driftX - currentState.driftX) < 0.01 &&
-        Math.abs(targetState.driftY - currentState.driftY) < 0.01;
+        Math.abs(targetState.trimStart - currentState.trimStart) < 0.01;
+
+      applyState();
 
       if (isSettled) {
         Object.assign(currentState, targetState);
-        applyState();
         rafId = 0;
         return;
       }
 
-      applyState();
       rafId = requestAnimationFrame(tick);
     };
 
@@ -1126,35 +1076,26 @@ if (contactForm) {
       const py = localY / rect.height;
       const nx = (px * 2) - 1;
       const ny = (py * 2) - 1;
-      const distance = Math.min(Math.hypot(nx, ny), 1.3);
-      const energy = clamp(1 - (distance * 0.58), 0.3, 1);
+      const distance = Math.min(Math.hypot(nx, ny), 1.28);
+      const energy = clamp(1 - (distance * 0.54), 0.34, 1);
+      const nextTrimStart = resolveTrimStart(localX, localY, rect.width, rect.height);
 
-      targetState.progress = clamp((0.45 + (energy * 0.55)) * strength, 0, 1);
-      targetState.x = clamp(px * 100, 14, 86);
+      targetState.progress = clamp((0.44 + (energy * 0.56)) * strength, 0, 1);
+      targetState.x = clamp(px * 100, 10, 90);
       targetState.y = clamp(py * 100, 18, 82);
-      targetState.tiltX = clamp(ny * -4.5 * strength, -4.5, 4.5);
-      targetState.tiltY = clamp(nx * 6.5 * strength, -6.5, 6.5);
-      targetState.sheenShift = clamp(-26 + (px * 64), -26, 38);
-      if (isEntry || Math.hypot(targetState.impactX, targetState.impactY) < 0.04) {
-        targetState.impactX = nx;
-        targetState.impactY = ny;
-      } else {
-        targetState.impactX = (targetState.impactX * 0.88) + (nx * 0.12);
-        targetState.impactY = (targetState.impactY * 0.88) + (ny * 0.12);
-      }
-      const escapeVector = resolveEscapeVector(targetState.impactX, targetState.impactY, nx, ny);
-      targetState.driftX = escapeVector.x * (2.6 + (escapeVector.strength * 6.6)) * strength;
-      targetState.driftY = escapeVector.y * (1.8 + (escapeVector.strength * 5.4)) * strength;
-      targetState.pointerX = nx;
-      targetState.pointerY = ny;
-      buildFragments();
-      updateFragments(nx, ny, targetState.impactX, targetState.impactY);
+      targetState.tiltX = clamp(ny * -3.9 * strength, -3.9, 3.9);
+      targetState.tiltY = clamp(nx * 5.8 * strength, -5.8, 5.8);
+      targetState.sheenShift = clamp(-24 + (px * 60), -24, 36);
+      targetState.trimStart = isEntry
+        ? nextTrimStart
+        : ((targetState.trimStart * 0.84) + (nextTrimStart * 0.16));
+
       ensureTick();
     };
 
     const activateCentered = (strength = 1) => {
       const rect = btn.getBoundingClientRect();
-      setTargetFromPoint(rect.left + (rect.width / 2), rect.top + (rect.height / 2), strength);
+      setTargetFromPoint(rect.left + (rect.width / 2), rect.top + (rect.height / 2), strength, true);
     };
 
     const resetTarget = () => {
@@ -1163,14 +1104,7 @@ if (contactForm) {
       targetState.y = 50;
       targetState.tiltX = 0;
       targetState.tiltY = 0;
-      targetState.sheenShift = -20;
-      targetState.driftX = 0;
-      targetState.driftY = 0;
-      targetState.impactX = 0;
-      targetState.impactY = 0;
-      targetState.pointerX = 0;
-      targetState.pointerY = 0;
-      updateFragments(0, 0, 0, 0);
+      targetState.sheenShift = -18;
       ensureTick();
     };
 
@@ -1187,7 +1121,7 @@ if (contactForm) {
     }
 
     btn.addEventListener("focus", () => {
-      activateCentered(1);
+      activateCentered(0.95);
     });
 
     btn.addEventListener("blur", resetTarget);
@@ -1201,16 +1135,136 @@ if (contactForm) {
     finePointerQuery.addEventListener?.("change", handleCapabilityChange);
     reducedMotionQuery.addEventListener?.("change", handleCapabilityChange);
 
-    window.addEventListener("resize", () => {
-      layoutKey = "";
-      buildFragments();
-      updateFragments(targetState.pointerX, targetState.pointerY, targetState.impactX, targetState.impactY);
-    });
-
-    buildFragments();
-    updateFragments(0, 0, 0, 0);
     applyState();
   });
+})();
+
+// --- Landing Hero Cursor Bulge ---
+(function initLandingHeroBulge() {
+  const bubblePointsSection = document.querySelector(".bubble-points-section");
+  const heroSection = bubblePointsSection?.previousElementSibling;
+  if (!bubblePointsSection || !heroSection || !heroSection.classList.contains("page-hero")) return;
+
+  heroSection.classList.add("hero-cursor-reactive");
+
+  const finePointerQuery = window.matchMedia("(pointer: fine)");
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  if (!finePointerQuery.matches || reducedMotionQuery.matches) return;
+
+  const currentState = {
+    x: 50,
+    y: 34,
+    strength: 0,
+    driftX: 0,
+    driftY: 0
+  };
+  const targetState = { ...currentState };
+  let rafId = 0;
+  let releaseTimer = 0;
+
+  const applyState = () => {
+    heroSection.style.setProperty("--hero-bulge-x", `${currentState.x.toFixed(2)}%`);
+    heroSection.style.setProperty("--hero-bulge-y", `${currentState.y.toFixed(2)}%`);
+    heroSection.style.setProperty("--hero-bulge-strength", currentState.strength.toFixed(4));
+    heroSection.style.setProperty("--hero-bulge-drift-x", `${currentState.driftX.toFixed(2)}px`);
+    heroSection.style.setProperty("--hero-bulge-drift-y", `${currentState.driftY.toFixed(2)}px`);
+  };
+
+  const tick = () => {
+    currentState.x += (targetState.x - currentState.x) * 0.08;
+    currentState.y += (targetState.y - currentState.y) * 0.08;
+    currentState.strength += (targetState.strength - currentState.strength) * 0.09;
+    currentState.driftX += (targetState.driftX - currentState.driftX) * 0.1;
+    currentState.driftY += (targetState.driftY - currentState.driftY) * 0.1;
+
+    const isSettled =
+      Math.abs(targetState.x - currentState.x) < 0.01 &&
+      Math.abs(targetState.y - currentState.y) < 0.01 &&
+      Math.abs(targetState.strength - currentState.strength) < 0.001 &&
+      Math.abs(targetState.driftX - currentState.driftX) < 0.01 &&
+      Math.abs(targetState.driftY - currentState.driftY) < 0.01;
+
+    applyState();
+
+    if (isSettled) {
+      Object.assign(currentState, targetState);
+      rafId = 0;
+      return;
+    }
+
+    rafId = requestAnimationFrame(tick);
+  };
+
+  const ensureTick = () => {
+    if (!rafId) {
+      rafId = requestAnimationFrame(tick);
+    }
+  };
+
+  const releaseBulge = () => {
+    targetState.strength = 0;
+    targetState.driftX = 0;
+    targetState.driftY = 0;
+    ensureTick();
+  };
+
+  const scheduleRelease = () => {
+    window.clearTimeout(releaseTimer);
+    releaseTimer = window.setTimeout(releaseBulge, 3000);
+  };
+
+  const setTargetFromPoint = (clientX, clientY) => {
+    const rect = heroSection.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const px = clamp((clientX - rect.left) / rect.width, 0, 1);
+    const py = clamp((clientY - rect.top) / rect.height, 0, 1);
+    const nx = (px * 2) - 1;
+    const ny = (py * 2) - 1;
+    const distance = Math.min(Math.hypot(nx, ny), 1.25);
+    const energy = clamp(1.04 - (distance * 0.5), 0.38, 1);
+
+    targetState.x = clamp(px * 100, 8, 92);
+    targetState.y = clamp(py * 100, 10, 90);
+    targetState.strength = energy;
+    targetState.driftX = nx * (8 + (energy * 16));
+    targetState.driftY = ny * (7 + (energy * 14));
+
+    scheduleRelease();
+    ensureTick();
+  };
+
+  const resetImmediately = () => {
+    window.clearTimeout(releaseTimer);
+    targetState.strength = 0;
+    targetState.driftX = 0;
+    targetState.driftY = 0;
+    ensureTick();
+  };
+
+  heroSection.addEventListener("pointerenter", (event) => {
+    setTargetFromPoint(event.clientX, event.clientY);
+  });
+
+  heroSection.addEventListener("pointermove", (event) => {
+    setTargetFromPoint(event.clientX, event.clientY);
+  });
+
+  heroSection.addEventListener("pointerleave", scheduleRelease);
+  window.addEventListener("blur", resetImmediately);
+
+  const handleCapabilityChange = () => {
+    if (reducedMotionQuery.matches || !finePointerQuery.matches) {
+      resetImmediately();
+    }
+  };
+
+  finePointerQuery.addEventListener?.("change", handleCapabilityChange);
+  reducedMotionQuery.addEventListener?.("change", handleCapabilityChange);
+
+  applyState();
 })();
 
 // --- Bubble Points Interaction ---
