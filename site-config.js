@@ -11,19 +11,19 @@ window.TGSiteConfig = {
     showOnPages: ["home", "services", "portfolio", "about", "contact"],
     content: {
       en: {
-        eyebrow: "Limited-Time Website Offer",
-        titleTop: "Hot Sale Offer",
+        eyebrow: "Website Design Offer",
+        titleTop: "Website Offer",
         titleMain: "Let us create\nyour unique website",
         description:
-          "Premium, tailored web design for local businesses that need a sharper first impression, stronger trust, and faster inquiry flow.",
+          "Premium, tailored web design for local businesses that need a sharper first impression, stronger trust, and easier contact.",
         points: [
           "Tailored design for your business",
-          "Mobile-first layout and CTA setup",
-          "WhatsApp-ready contact flow"
+          "Mobile-first layout and clear contact path",
+          "WhatsApp and form contact path"
         ],
         primaryCta: {
           type: "whatsapp",
-          label: "Claim Offer",
+          label: "Get Offer Details",
           message: "Hello, I saw your website offer and want details for my business."
         },
         secondaryCta: {
@@ -35,18 +35,18 @@ window.TGSiteConfig = {
       },
       ka: {
         eyebrow: "ვებსაიტის სპეციალური შეთავაზება",
-        titleTop: "ცხელი შეთავაზება",
+        titleTop: "ვებსაიტის შეთავაზება",
         titleMain: "შევქმნათ თქვენი\nუნიკალური ვებსაიტი",
         description:
-          "პრემიუმ, ბიზნესზე მორგებული ვებსაიტი ძლიერი პირველი შთაბეჭდილებისთვის, მეტი ნდობისთვის და უფრო მარტივი მოთხოვნების მისაღებად.",
+          "ბიზნესზე მორგებული პრემიუმ ვებსაიტი ძლიერი პირველი შთაბეჭდილებისთვის, მეტი ნდობისთვის და უფრო მარტივი კონტაქტისთვის.",
         points: [
           "თქვენს ბიზნესზე მორგებული დიზაინი",
-          "მობილურზე გამართული სტრუქტურა და CTA",
-          "WhatsApp-ზე ორიენტირებული საკონტაქტო გზა"
+          "მობილურზე გამართული სტრუქტურა და მკაფიო საკონტაქტო გზა",
+          "WhatsApp-ისა და ფორმის გამართული კონტაქტი"
         ],
         primaryCta: {
           type: "whatsapp",
-          label: "შეთავაზების მიღება",
+          label: "დეტალების მიღება",
           message: "გამარჯობა, ვნახე თქვენი ვებსაიტის შეთავაზება და მეტი დეტალი მაინტერესებს ჩემი ბიზნესისთვის."
         },
         secondaryCta: {

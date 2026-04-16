@@ -23,7 +23,7 @@ const projectDetails = {
         "The salon looked active online, but service trust, booking clarity, and premium positioning were inconsistent across the website and Instagram page.",
       solution:
         "We built a cleaner mobile-first website, aligned the visual identity, and added a faster WhatsApp booking path with stronger treatment presentation.",
-      tools: "Multi-page website, social templates, WhatsApp CTA flow, local SEO basics",
+      tools: "Multi-page website, social templates, WhatsApp contact path, local SEO basics",
       outcome:
         "A more polished first impression, clearer services, and a shorter path from profile visit to consultation request."
     },
@@ -34,7 +34,7 @@ const projectDetails = {
         "სალონი სოციალურ მედიაში აქტიური ჩანდა, მაგრამ სერვისების ნდობა, დაჯავშნის სიცხადე და პრემიუმ პოზიციონირება ვებსაიტსა და Instagram-ზე არათანმიმდევრული იყო.",
       solution:
         "შევქმენით უფრო სუფთა, მობილურზე მორგებული ვებსაიტი, გავათანაბრეთ ვიზუალური იდენტობა და დავამატეთ უფრო სწრაფი WhatsApp დაჯავშნის გზა.",
-      tools: "მრავალგვერდიანი ვებსაიტი, სოციალური შაბლონები, WhatsApp CTA ნაკადი, ლოკალური SEO საფუძვლები",
+      tools: "მრავალგვერდიანი ვებსაიტი, სოციალური შაბლონები, WhatsApp საკონტაქტო გზა, ლოკალური SEO საფუძვლები",
       outcome:
         "უფრო ძლიერი პირველი შთაბეჭდილება, უფრო გასაგები სერვისები და პროფილის ნახვიდან კონსულტაციის მოთხოვნამდე უფრო მოკლე გზა."
     }
@@ -47,7 +47,7 @@ const projectDetails = {
         "Important treatment details, doctor credibility, and appointment actions were scattered, which weakened trust for higher-value patients.",
       solution:
         "We created a calm, modern structure with treatment pages, doctor trust blocks, FAQ sections, and direct contact actions across mobile screens.",
-      tools: "Website creation, service page structure, conversion copy, form and map setup",
+      tools: "Website creation, service page structure, conversion copy, form and map integration",
       outcome:
         "Stronger credibility for first-time visitors and a clearer path to calls, messages, and appointment requests."
     },
@@ -90,12 +90,12 @@ const projectDetails = {
   metro: {
     en: {
       title: "Metro Keys Realty",
-      subtitle: "Lead-focused landing pages for property inquiries",
+      subtitle: "Landing pages built for clearer property inquiries",
       problem:
         "Listings lived across platforms with no central presentation, weak broker trust framing, and no clean lead capture path.",
       solution:
-        "We designed property landing pages, broker profile sections, and WhatsApp-first inquiry flows that feel sharper and easier to act on.",
-      tools: "Landing pages, inquiry funnel setup, listing visual system, CTA architecture",
+        "We designed property landing pages, broker profile sections, and WhatsApp-led inquiry paths that feel sharper and easier to act on.",
+      tools: "Landing pages, inquiry path planning, listing visual system, contact-path structure",
       outcome:
         "Better lead qualification and a more professional handoff from interest to property inquiry."
     },
@@ -105,8 +105,8 @@ const projectDetails = {
       problem:
         "ობიექტები სხვადასხვა პლატფორმაზე იყო განაწილებული, ცენტრალური პრეზენტაცია არ არსებობდა, ბროკერის ნდობის ბლოკები სუსტი იყო და ლიდის აღების გზა არ იყო გამართული.",
       solution:
-        "შევქმნით ქონების ლენდინგები, ბროკერის პროფილის სექციები და WhatsApp-ზე ორიენტირებული მოთხოვნის ნაკადები, რომელზეც რეაგირება უფრო მარტივია.",
-      tools: "ლენდინგები, მოთხოვნის funnel-ის დაყენება, ლისტინგის ვიზუალური სისტემა, CTA არქიტექტურა",
+        "შევქმენით ქონების ლენდინგები, ბროკერის პროფილის სექციები და WhatsApp-ზე ორიენტირებული მოთხოვნის გზები, რომლებზეც რეაგირება უფრო მარტივია.",
+      tools: "ლენდინგები, მოთხოვნის გზის გამართვა, ლისტინგის ვიზუალური სისტემა, საკონტაქტო გზის სტრუქტურა",
       outcome:
         "უკეთესი ლიდების კვალიფიკაცია და ინტერესიდან ქონების მოთხოვნამდე უფრო პროფესიული გადასვლა."
     }
@@ -1182,9 +1182,31 @@ if (contactForm) {
 
   heroSection.classList.add("hero-cursor-reactive");
 
+  const trailNodes = ["a", "b"].map((suffix) => {
+    const existingTrail = heroSection.querySelector(`.hero-bulge-trail-${suffix}`);
+    if (existingTrail) return existingTrail;
+
+    const trail = document.createElement("span");
+    trail.className = `hero-bulge-trail hero-bulge-trail-${suffix}`;
+    trail.setAttribute("aria-hidden", "true");
+    heroSection.insertBefore(trail, heroSection.firstChild);
+
+    return trail;
+  });
+
   const finePointerQuery = window.matchMedia("(pointer: fine)");
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const createTrailState = () => ({
+    x: 50,
+    y: 34,
+    depth: 0,
+    opacity: 0,
+    driftX: 0,
+    driftY: 0,
+    tiltX: 0,
+    tiltY: 0
+  });
 
   if (!finePointerQuery.matches || reducedMotionQuery.matches) return;
 
@@ -1202,6 +1224,8 @@ if (contactForm) {
     driftY: 0
   };
   const targetState = { ...currentState };
+  const trailStates = trailNodes.map(() => createTrailState());
+  const trailTargets = trailNodes.map(() => createTrailState());
   let rafId = 0;
   let releaseTimer = 0;
 
@@ -1217,6 +1241,18 @@ if (contactForm) {
     heroSection.style.setProperty("--hero-bulge-stretch-y", currentState.stretchY.toFixed(4));
     heroSection.style.setProperty("--hero-bulge-drift-x", `${currentState.driftX.toFixed(2)}px`);
     heroSection.style.setProperty("--hero-bulge-drift-y", `${currentState.driftY.toFixed(2)}px`);
+
+    trailNodes.forEach((trailNode, index) => {
+      const trailState = trailStates[index];
+      trailNode.style.setProperty("--trail-x", `${trailState.x.toFixed(2)}%`);
+      trailNode.style.setProperty("--trail-y", `${trailState.y.toFixed(2)}%`);
+      trailNode.style.setProperty("--trail-depth", trailState.depth.toFixed(4));
+      trailNode.style.setProperty("--trail-opacity", trailState.opacity.toFixed(4));
+      trailNode.style.setProperty("--trail-drift-x", `${trailState.driftX.toFixed(2)}px`);
+      trailNode.style.setProperty("--trail-drift-y", `${trailState.driftY.toFixed(2)}px`);
+      trailNode.style.setProperty("--trail-tilt-x", `${trailState.tiltX.toFixed(2)}deg`);
+      trailNode.style.setProperty("--trail-tilt-y", `${trailState.tiltY.toFixed(2)}deg`);
+    });
   };
 
   const tick = () => {
@@ -1232,6 +1268,20 @@ if (contactForm) {
     currentState.driftX += (targetState.driftX - currentState.driftX) * 0.12;
     currentState.driftY += (targetState.driftY - currentState.driftY) * 0.12;
 
+    trailStates.forEach((trailState, index) => {
+      const trailTarget = trailTargets[index];
+      const easingBase = index === 0 ? 0.14 : 0.1;
+
+      trailState.x += (trailTarget.x - trailState.x) * easingBase;
+      trailState.y += (trailTarget.y - trailState.y) * easingBase;
+      trailState.depth += (trailTarget.depth - trailState.depth) * (easingBase * 0.92);
+      trailState.opacity += (trailTarget.opacity - trailState.opacity) * (easingBase * 0.72);
+      trailState.driftX += (trailTarget.driftX - trailState.driftX) * (easingBase * 0.88);
+      trailState.driftY += (trailTarget.driftY - trailState.driftY) * (easingBase * 0.88);
+      trailState.tiltX += (trailTarget.tiltX - trailState.tiltX) * (easingBase * 0.86);
+      trailState.tiltY += (trailTarget.tiltY - trailState.tiltY) * (easingBase * 0.86);
+    });
+
     const isSettled =
       Math.abs(targetState.x - currentState.x) < 0.01 &&
       Math.abs(targetState.y - currentState.y) < 0.01 &&
@@ -1243,12 +1293,29 @@ if (contactForm) {
       Math.abs(targetState.stretchX - currentState.stretchX) < 0.001 &&
       Math.abs(targetState.stretchY - currentState.stretchY) < 0.001 &&
       Math.abs(targetState.driftX - currentState.driftX) < 0.01 &&
-      Math.abs(targetState.driftY - currentState.driftY) < 0.01;
+      Math.abs(targetState.driftY - currentState.driftY) < 0.01 &&
+      trailStates.every((trailState, index) => {
+        const trailTarget = trailTargets[index];
+
+        return (
+          Math.abs(trailTarget.x - trailState.x) < 0.01 &&
+          Math.abs(trailTarget.y - trailState.y) < 0.01 &&
+          Math.abs(trailTarget.depth - trailState.depth) < 0.001 &&
+          Math.abs(trailTarget.opacity - trailState.opacity) < 0.001 &&
+          Math.abs(trailTarget.driftX - trailState.driftX) < 0.01 &&
+          Math.abs(trailTarget.driftY - trailState.driftY) < 0.01 &&
+          Math.abs(trailTarget.tiltX - trailState.tiltX) < 0.01 &&
+          Math.abs(trailTarget.tiltY - trailState.tiltY) < 0.01
+        );
+      });
 
     applyState();
 
     if (isSettled) {
       Object.assign(currentState, targetState);
+      trailStates.forEach((trailState, index) => {
+        Object.assign(trailState, trailTargets[index]);
+      });
       rafId = 0;
       return;
     }
@@ -1272,6 +1339,16 @@ if (contactForm) {
     targetState.stretchY = 1;
     targetState.driftX = 0;
     targetState.driftY = 0;
+
+    trailTargets.forEach((trailTarget, index) => {
+      trailTarget.depth = 0;
+      trailTarget.opacity = 0;
+      trailTarget.driftX *= 0.36;
+      trailTarget.driftY *= 0.36;
+      trailTarget.tiltX *= 0.42;
+      trailTarget.tiltY *= 0.42;
+    });
+
     ensureTick();
   };
 
@@ -1303,18 +1380,33 @@ if (contactForm) {
 
     lastPointer = { x: px, y: py, time: now };
     const lift = centerBias + motionBoost;
+    const trailSeed = {
+      x: currentState.x,
+      y: currentState.y,
+      depth: Math.max(0, currentState.depth * 0.72),
+      opacity: clamp((currentState.depth * 0.22) + (currentState.surge * 0.32), 0, 0.72),
+      driftX: currentState.driftX * 0.56,
+      driftY: currentState.driftY * 0.56,
+      tiltX: currentState.tiltX * 0.46,
+      tiltY: currentState.tiltY * 0.46
+    };
+
+    for (let index = trailTargets.length - 1; index > 0; index -= 1) {
+      Object.assign(trailTargets[index], trailTargets[index - 1]);
+    }
+    Object.assign(trailTargets[0], trailSeed);
 
     targetState.x = clamp(px * 100, 8, 92);
     targetState.y = clamp(py * 100, 10, 90);
     targetState.strength = clamp(energy + (motionBoost * 0.22), 0, 1);
-    targetState.depth = 0.32 + (centerBias * 1.48) + (motionBoost * 0.7);
-    targetState.surge = 0.08 + (centerBias * 0.24) + motionBoost;
-    targetState.tiltX = ny * -8.8 * lift;
-    targetState.tiltY = nx * 10.8 * lift;
-    targetState.stretchX = 1 + (centerBias * 0.12);
-    targetState.stretchY = 1 + (centerBias * 0.12);
-    targetState.driftX = nx * (22 + (lift * 38));
-    targetState.driftY = ny * (18 + (lift * 34));
+    targetState.depth = 0.24 + (centerBias * 1.02) + (motionBoost * 0.38);
+    targetState.surge = 0.12 + (centerBias * 0.22) + (motionBoost * 0.92);
+    targetState.tiltX = ny * -7.2 * lift;
+    targetState.tiltY = nx * 8.6 * lift;
+    targetState.stretchX = 1 + (centerBias * 0.06);
+    targetState.stretchY = 1 + (centerBias * 0.06);
+    targetState.driftX = nx * (18 + (lift * 28));
+    targetState.driftY = ny * (15 + (lift * 24));
 
     scheduleRelease();
     ensureTick();
@@ -1332,6 +1424,10 @@ if (contactForm) {
     targetState.driftX = 0;
     targetState.driftY = 0;
     lastPointer = null;
+    trailTargets.forEach((trailTarget, index) => {
+      Object.assign(trailTarget, createTrailState());
+      Object.assign(trailStates[index], createTrailState());
+    });
     ensureTick();
   };
 

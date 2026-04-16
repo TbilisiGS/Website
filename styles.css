@@ -154,14 +154,92 @@ button {
   --hero-bulge-drift-y: 0px;
 }
 
+.page-hero.hero-cursor-reactive .hero-bulge-trail {
+  --trail-base-scale: 1;
+  --trail-opacity-factor: 1;
+  position: absolute;
+  left: var(--trail-x, 50%);
+  top: var(--trail-y, 34%);
+  width: clamp(96px, calc(92px + (var(--trail-depth) * 52px)), 168px);
+  height: clamp(96px, calc(92px + (var(--trail-depth) * 52px)), 168px);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+  background:
+    radial-gradient(
+      circle at 28% 24%,
+      rgba(255, 255, 255, calc((var(--trail-depth) * 0.26) + 0.12)) 0%,
+      rgba(255, 255, 255, calc(var(--trail-depth) * 0.14)) 12%,
+      rgba(255, 255, 255, 0) 24%
+    ),
+    radial-gradient(
+      circle at 48% 48%,
+      rgba(245, 251, 255, calc((var(--trail-depth) * 0.18) + 0.04)) 0%,
+      rgba(207, 235, 255, calc(var(--trail-depth) * 0.24)) 30%,
+      rgba(114, 174, 255, calc(var(--trail-depth) * 0.14)) 54%,
+      rgba(114, 174, 255, 0) 74%
+    ),
+    radial-gradient(
+      circle at 74% 78%,
+      rgba(11, 24, 58, calc(var(--trail-depth) * 0.18)) 0%,
+      rgba(11, 24, 58, 0) 34%
+    );
+  transform:
+    perspective(1800px)
+    translate3d(
+      calc(-50% + (var(--trail-drift-x, 0px) * 0.2)),
+      calc(-50% + (var(--trail-drift-y, 0px) * 0.2)),
+      calc(var(--trail-depth, 0) * 62px)
+    )
+    rotateX(calc(var(--trail-tilt-x, 0deg) * 0.72))
+    rotateY(calc(var(--trail-tilt-y, 0deg) * 0.72))
+    scale(calc((0.82 + (var(--trail-depth, 0) * 0.12)) * var(--trail-base-scale)));
+  transform-origin: center;
+  filter:
+    blur(calc(8px - (var(--trail-depth, 0) * 1.2px)))
+    saturate(calc(1.04 + (var(--trail-depth, 0) * 0.12)));
+  -webkit-backdrop-filter:
+    blur(calc(10px + (var(--trail-depth, 0) * 3px)))
+    saturate(calc(1.02 + (var(--trail-depth, 0) * 0.08)));
+  backdrop-filter:
+    blur(calc(10px + (var(--trail-depth, 0) * 3px)))
+    saturate(calc(1.02 + (var(--trail-depth, 0) * 0.08)));
+  box-shadow:
+    inset 0 14px 18px rgba(255, 255, 255, calc(var(--trail-depth, 0) * 0.16)),
+    inset 0 -16px 20px rgba(8, 19, 47, calc(var(--trail-depth, 0) * 0.16)),
+    0 14px 30px rgba(101, 152, 241, calc(var(--trail-depth, 0) * 0.1));
+  opacity: calc(var(--trail-opacity, 0) * var(--trail-opacity-factor));
+  transition:
+    transform 1520ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 1320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1380ms ease,
+    backdrop-filter 1320ms cubic-bezier(0.22, 1, 0.36, 1),
+    -webkit-backdrop-filter 1320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-hero.hero-cursor-reactive .hero-bulge-trail-a {
+  --trail-base-scale: 0.94;
+  --trail-opacity-factor: 0.82;
+}
+
+.page-hero.hero-cursor-reactive .hero-bulge-trail-b {
+  --trail-base-scale: 1.08;
+  --trail-opacity-factor: 0.58;
+  filter:
+    blur(calc(10px - (var(--trail-depth, 0) * 1px)))
+    saturate(calc(1.02 + (var(--trail-depth, 0) * 0.08)));
+}
+
 .page-hero.hero-cursor-reactive::before,
 .page-hero.hero-cursor-reactive::after {
   content: "";
   position: absolute;
   left: var(--hero-bulge-x);
   top: var(--hero-bulge-y);
-  width: clamp(210px, calc(205px + (var(--hero-bulge-depth) * 110px) + (var(--hero-bulge-surge) * 120px)), 350px);
-  height: clamp(210px, calc(205px + (var(--hero-bulge-depth) * 110px) + (var(--hero-bulge-surge) * 120px)), 350px);
+  width: clamp(132px, calc(130px + (var(--hero-bulge-depth) * 72px) + (var(--hero-bulge-surge) * 56px)), 236px);
+  height: clamp(132px, calc(130px + (var(--hero-bulge-depth) * 72px) + (var(--hero-bulge-surge) * 56px)), 236px);
   border-radius: 50%;
   z-index: 0;
   pointer-events: none;
@@ -171,59 +249,57 @@ button {
 .page-hero.hero-cursor-reactive::before {
   background:
     radial-gradient(
-      circle at 30% 24%,
-      rgba(255, 255, 255, calc(0.18 + (var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.22))) 0%,
-      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.24) + (var(--hero-bulge-surge) * 0.1))) 12%,
-      rgba(255, 255, 255, 0) 30%
+      circle at 28% 22%,
+      rgba(255, 255, 255, calc(0.3 + (var(--hero-bulge-depth) * 0.34) + (var(--hero-bulge-surge) * 0.26))) 0%,
+      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.15))) 10%,
+      rgba(255, 255, 255, 0) 24%
     ),
     radial-gradient(
-      circle at 50% 50%,
-      rgba(255, 255, 255, calc(0.05 + (var(--hero-bulge-depth) * 0.16) + (var(--hero-bulge-surge) * 0.14))) 0%,
-      rgba(255, 247, 229, calc((var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.1))) 18%,
-      rgba(211, 229, 255, calc((var(--hero-bulge-depth) * 0.28) + (var(--hero-bulge-surge) * 0.08))) 40%,
-      rgba(119, 161, 229, calc((var(--hero-bulge-depth) * 0.16) + (var(--hero-bulge-surge) * 0.06))) 58%,
-      rgba(86, 123, 192, 0) 78%
+      circle at 48% 48%,
+      rgba(255, 255, 255, calc(0.08 + (var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.12))) 0%,
+      rgba(247, 252, 255, calc((var(--hero-bulge-depth) * 0.34) + (var(--hero-bulge-surge) * 0.16))) 16%,
+      rgba(210, 237, 255, calc((var(--hero-bulge-depth) * 0.34) + (var(--hero-bulge-surge) * 0.12))) 34%,
+      rgba(116, 181, 255, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.08))) 52%,
+      rgba(87, 139, 235, 0) 70%
     ),
     radial-gradient(
-      circle at 72% 76%,
-      rgba(15, 26, 55, calc((var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.08))) 0%,
-      rgba(15, 26, 55, calc(var(--hero-bulge-depth) * 0.12)) 18%,
-      rgba(15, 26, 55, 0) 44%
+      circle at 74% 78%,
+      rgba(11, 24, 58, calc((var(--hero-bulge-depth) * 0.34) + (var(--hero-bulge-surge) * 0.12))) 0%,
+      rgba(11, 24, 58, calc(var(--hero-bulge-depth) * 0.14)) 16%,
+      rgba(11, 24, 58, 0) 38%
     ),
-    linear-gradient(
-      140deg,
-      rgba(255, 255, 255, calc(var(--hero-bulge-depth) * 0.18)) 8%,
-      rgba(255, 255, 255, 0) 42%,
-      rgba(26, 50, 96, calc(var(--hero-bulge-depth) * 0.08)) 100%
+    radial-gradient(
+      circle at 44% 56%,
+      rgba(255, 234, 191, calc((var(--hero-bulge-depth) * 0.18) + (var(--hero-bulge-surge) * 0.08))) 0%,
+      rgba(255, 234, 191, 0) 28%
     );
   transform:
     perspective(1800px)
     translate3d(
-      calc(-50% + (var(--hero-bulge-drift-x) * 0.3)),
-      calc(-50% + (var(--hero-bulge-drift-y) * 0.3)),
-      calc((var(--hero-bulge-depth) * 118px) + (var(--hero-bulge-surge) * 38px))
+      calc(-50% + (var(--hero-bulge-drift-x) * 0.22)),
+      calc(-50% + (var(--hero-bulge-drift-y) * 0.22)),
+      calc((var(--hero-bulge-depth) * 90px) + (var(--hero-bulge-surge) * 24px))
     )
     rotateX(calc(var(--hero-bulge-tilt-x) * 1.05))
     rotateY(calc(var(--hero-bulge-tilt-y) * 1.05))
-    scale(calc(0.54 + (var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.16)));
+    scale(calc(0.9 + (var(--hero-bulge-depth) * 0.12) + (var(--hero-bulge-surge) * 0.08)));
   transform-origin: center;
   filter:
-    blur(calc(10px - (var(--hero-bulge-depth) * 2.8px) - (var(--hero-bulge-surge) * 1.5px)))
-    saturate(calc(1 + (var(--hero-bulge-depth) * 0.32) + (var(--hero-bulge-surge) * 0.14)))
-    contrast(calc(1 + (var(--hero-bulge-depth) * 0.18)));
+    blur(calc(6px - (var(--hero-bulge-depth) * 1.5px) - (var(--hero-bulge-surge) * 1px)))
+    saturate(calc(1.08 + (var(--hero-bulge-depth) * 0.4) + (var(--hero-bulge-surge) * 0.18)))
+    contrast(calc(1.08 + (var(--hero-bulge-depth) * 0.24)));
   -webkit-backdrop-filter:
-    blur(calc(14px + (var(--hero-bulge-depth) * 7px) + (var(--hero-bulge-surge) * 2px)))
-    saturate(calc(1.04 + (var(--hero-bulge-depth) * 0.28)));
+    blur(calc(11px + (var(--hero-bulge-depth) * 4px) + (var(--hero-bulge-surge) * 1.5px)))
+    saturate(calc(1.08 + (var(--hero-bulge-depth) * 0.3)));
   backdrop-filter:
-    blur(calc(14px + (var(--hero-bulge-depth) * 7px) + (var(--hero-bulge-surge) * 2px)))
-    saturate(calc(1.04 + (var(--hero-bulge-depth) * 0.28)));
+    blur(calc(11px + (var(--hero-bulge-depth) * 4px) + (var(--hero-bulge-surge) * 1.5px)))
+    saturate(calc(1.08 + (var(--hero-bulge-depth) * 0.3)));
   box-shadow:
-    inset 0 20px 30px rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.08))),
-    inset 0 -28px 36px rgba(6, 16, 39, calc((var(--hero-bulge-depth) * 0.24) + (var(--hero-bulge-surge) * 0.06))),
-    inset 12px 10px 18px rgba(255, 255, 255, calc(var(--hero-bulge-depth) * 0.08)),
-    -8px -8px 18px rgba(255, 255, 255, calc(var(--hero-bulge-depth) * 0.12)),
-    0 18px 36px rgba(64, 98, 168, calc((var(--hero-bulge-depth) * 0.12) + (var(--hero-bulge-surge) * 0.04)));
-  opacity: calc((var(--hero-bulge-depth) * 0.74) + (var(--hero-bulge-surge) * 0.16));
+    inset 0 14px 18px rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.26) + (var(--hero-bulge-surge) * 0.08))),
+    inset 0 -18px 22px rgba(7, 20, 49, calc((var(--hero-bulge-depth) * 0.26) + (var(--hero-bulge-surge) * 0.08))),
+    inset 8px 8px 12px rgba(255, 255, 255, calc(var(--hero-bulge-depth) * 0.12)),
+    0 14px 30px rgba(90, 147, 244, calc((var(--hero-bulge-depth) * 0.16) + (var(--hero-bulge-surge) * 0.08)));
+  opacity: calc((var(--hero-bulge-depth) * 0.88) + (var(--hero-bulge-surge) * 0.24));
   transition:
     transform 1250ms cubic-bezier(0.22, 1, 0.36, 1),
     filter 1100ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -237,43 +313,43 @@ button {
   background:
     radial-gradient(
       circle at 50% 50%,
-      rgba(255, 255, 255, 0) 50%,
-      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.08))) 61%,
-      rgba(165, 201, 255, calc(var(--hero-bulge-depth) * 0.16)) 68%,
-      rgba(17, 31, 70, calc((var(--hero-bulge-depth) * 0.18) + (var(--hero-bulge-surge) * 0.05))) 82%,
-      rgba(17, 31, 70, 0) 94%
+      rgba(255, 255, 255, 0) 54%,
+      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.28) + (var(--hero-bulge-surge) * 0.12))) 63%,
+      rgba(173, 216, 255, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.08))) 71%,
+      rgba(18, 39, 86, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.06))) 86%,
+      rgba(18, 39, 86, 0) 98%
     ),
     radial-gradient(
       circle at 28% 24%,
-      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.88) + (var(--hero-bulge-surge) * 0.22))) 0%,
-      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.24) + (var(--hero-bulge-surge) * 0.08))) 14%,
-      rgba(255, 255, 255, 0) 28%
+      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.92) + (var(--hero-bulge-surge) * 0.28))) 0%,
+      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.28) + (var(--hero-bulge-surge) * 0.12))) 12%,
+      rgba(255, 255, 255, 0) 24%
     ),
     radial-gradient(
       circle at 76% 78%,
-      rgba(7, 15, 36, calc((var(--hero-bulge-depth) * 0.34) + (var(--hero-bulge-surge) * 0.08))) 0%,
-      rgba(7, 15, 36, 0) 28%
+      rgba(7, 15, 36, calc((var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.08))) 0%,
+      rgba(7, 15, 36, 0) 22%
     );
-  border: 1px solid rgba(255, 255, 255, calc(0.08 + (var(--hero-bulge-depth) * 0.18) + (var(--hero-bulge-surge) * 0.08)));
+  border: 1px solid rgba(255, 255, 255, calc(0.16 + (var(--hero-bulge-depth) * 0.24) + (var(--hero-bulge-surge) * 0.12)));
   transform:
     perspective(1800px)
     translate3d(
-      calc(-50% + (var(--hero-bulge-drift-x) * 0.46)),
-      calc(-50% + (var(--hero-bulge-drift-y) * 0.46)),
-      calc((var(--hero-bulge-depth) * 148px) + (var(--hero-bulge-surge) * 46px))
+      calc(-50% + (var(--hero-bulge-drift-x) * 0.32)),
+      calc(-50% + (var(--hero-bulge-drift-y) * 0.32)),
+      calc((var(--hero-bulge-depth) * 108px) + (var(--hero-bulge-surge) * 28px))
     )
     rotateX(calc(var(--hero-bulge-tilt-x) * 1.16))
     rotateY(calc(var(--hero-bulge-tilt-y) * 1.16))
-    scale(calc(0.62 + (var(--hero-bulge-depth) * 0.32) + (var(--hero-bulge-surge) * 0.18)));
+    scale(calc(0.98 + (var(--hero-bulge-depth) * 0.12) + (var(--hero-bulge-surge) * 0.08)));
   transform-origin: center;
   box-shadow:
-    inset 0 2px 6px rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.28) + (var(--hero-bulge-surge) * 0.1))),
-    inset 0 -14px 18px rgba(11, 21, 47, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.06))),
-    0 0 22px rgba(255, 249, 233, calc((var(--hero-bulge-depth) * 0.14) + (var(--hero-bulge-surge) * 0.08)));
+    inset 0 2px 5px rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.34) + (var(--hero-bulge-surge) * 0.12))),
+    inset 0 -10px 14px rgba(11, 21, 47, calc((var(--hero-bulge-depth) * 0.2) + (var(--hero-bulge-surge) * 0.06))),
+    0 0 16px rgba(255, 249, 233, calc((var(--hero-bulge-depth) * 0.18) + (var(--hero-bulge-surge) * 0.12)));
   filter:
-    blur(calc(4px - (var(--hero-bulge-depth) * 0.8px)))
-    drop-shadow(0 0 18px rgba(255, 244, 214, calc((var(--hero-bulge-depth) * 0.2) + (var(--hero-bulge-surge) * 0.08))));
-  opacity: calc((var(--hero-bulge-depth) * 0.86) + (var(--hero-bulge-surge) * 0.16));
+    blur(calc(2px - (var(--hero-bulge-depth) * 0.4px)))
+    drop-shadow(0 0 12px rgba(255, 244, 214, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.12))));
+  opacity: calc((var(--hero-bulge-depth) * 0.96) + (var(--hero-bulge-surge) * 0.22));
   transition:
     transform 1380ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 1180ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -1575,6 +1651,67 @@ html[lang="ka"] .lang-link {
 
 .bubble-center strong {
   font-weight: 800;
+}
+
+html[lang="ka"] .bubble-node-top h3,
+html[lang="ka"] .bubble-node-header h3,
+html[lang="ka"] .bubble-center-label,
+html[lang="ka"] .bubble-center p {
+  font-family: var(--font-georgian-body);
+}
+
+html[lang="ka"] .bubble-node-top h3 {
+  font-size: clamp(1.08rem, 1.55vw, 1.42rem);
+  line-height: 1.14;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+html[lang="ka"] .bubble-node-header h3 {
+  font-size: clamp(0.84rem, 1.02vw, 1.04rem);
+  line-height: 1.22;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+html[lang="ka"] .bubble-node p {
+  font-size: 0.89rem;
+  line-height: 1.54;
+}
+
+html[lang="ka"] .bubble-node {
+  width: min(100%, 27rem);
+  padding: 1.32rem 1.42rem 1.42rem;
+}
+
+html[lang="ka"] .bubble-center {
+  width: min(100%, 30rem);
+  padding: 2rem 2.05rem 2.1rem;
+}
+
+html[lang="ka"] .bubble-node-header {
+  gap: 0.68rem;
+}
+
+html[lang="ka"] .bubble-center-label {
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+html[lang="ka"] .bubble-center p {
+  font-size: clamp(1.02rem, 1.22vw, 1.26rem);
+  line-height: 1.34;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+html[lang="ka"] .bubble-node-top h3,
+html[lang="ka"] .bubble-node-header h3,
+html[lang="ka"] .bubble-center p {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
 }
 
 .testimonial-card blockquote {
@@ -3132,7 +3269,11 @@ html[lang="ka"] .brandbook-list dt {
 .promo-popup-title {
   display: grid;
   gap: 0.25rem;
-  max-width: 20ch;
+  width: min(100%, 760px);
+  max-width: none;
+  justify-self: stretch;
+  justify-items: center;
+  margin: 0 auto;
 }
 
 .promo-popup-title-top,
@@ -3156,7 +3297,9 @@ html[lang="ka"] .brandbook-list dt {
   font-weight: 800;
   line-height: 0.94;
   letter-spacing: -0.05em;
-  white-space: normal;
+  width: 100%;
+  white-space: pre-line;
+  text-wrap: balance;
   color: #f4f7ff;
   text-shadow:
     0 5px 0 rgba(23, 10, 57, 0.42),
@@ -4008,6 +4151,7 @@ html[lang="ka"] .brandbook-list dt {
   .dynamic-button-stroke-full,
   .page-hero.hero-cursor-reactive::before,
   .page-hero.hero-cursor-reactive::after,
+  .page-hero.hero-cursor-reactive .hero-bulge-trail,
   .page-hero.hero-cursor-reactive .orb-a,
   .page-hero.hero-cursor-reactive .orb-b {
     transition: none;
