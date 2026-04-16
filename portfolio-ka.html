@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ka">
   <head>
     <meta charset="utf-8">
@@ -13,13 +13,14 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <a class="skip-link" href="#main-content">კონტენტზე გადასვლა</a>
     <header class="site-header">
       <div class="container">
         <div class="header-shell">
           <a class="brand" href="index-ka.html" aria-label="Tbilisi Growth Studio მთავარი გვერდი">
             <img class="brand-icon" src="logo.png" alt="Tbilisi Growth Studio ლოგოს აიკონი">
           </a>
-          <nav class="site-nav" aria-label="მთავარი ნავიგაცია">
+          <nav class="site-nav" aria-label="მთავარი">
             <ul class="nav-list">
               <li><a class="nav-link" data-nav="home" href="index-ka.html">მთავარი</a></li>
               <li><a class="nav-link" data-nav="services" href="services-ka.html">სერვისები</a></li>
@@ -46,7 +47,7 @@
       </div>
     </header>
 
-    <main>
+    <main id="main-content">
       <section class="page-hero">
         <div class="container hero-grid">
           <div class="hero-copy reveal">
@@ -64,7 +65,7 @@
           <div class="panel reveal">
             <span class="eyebrow">რატომ არის ეს მნიშვნელოვანი</span>
             <h2>კარგი ვიზუალური გემო მნიშვნელოვანია, მაგრამ მიზანი მხოლოდ ლამაზი იერსახე არ არის.</h2>
-            <p class="lead">ყოველი ქეისი შექმნილია იმისთვის, რომ გაზარდოს ნდობა, შეამციროს დაბნეულობა და შექმნას უფრო მკაფიო გზა მოთხოვნების, დაჯავშნების ან ფასის მიღებისკენ.</p>
+            <p class="lead">ყოველი ქეისი შექმნილია იმისთვის, რომ გაზარდოს ნდობა, შეამციროს გაუგებრობა და შექმნას უფრო მკაფიო გზა მოთხოვნამდე, დაჯავშნამდე ან ფასის მოთხოვნამდე.</p>
           </div>
         </div>
       </section>
@@ -80,7 +81,14 @@
 
       <section class="section">
         <div class="container">
-          <div class="filter-bar reveal" aria-label="Portfolio filters">
+          <div class="filter-summary reveal">
+            <div>
+              <span class="eyebrow">იპოვეთ საჭიროების მიხედვით</span>
+              <p class="lead">მოირგეთ ფილტრი deliverable-ის ან სექტორის მიხედვით, რომ შესაბამისი პროექტი უფრო სწრაფად ნახოთ.</p>
+            </div>
+            <strong class="filter-count" data-filter-count>6 პროექტი ჩანს</strong>
+          </div>
+          <div class="filter-bar reveal" aria-label="პორტფოლიოს ფილტრები">
             <button class="filter-chip is-active" type="button" data-filter="all">ყველა</button>
             <button class="filter-chip" type="button" data-filter="websites">ვებსაიტები</button>
             <button class="filter-chip" type="button" data-filter="social">სოციალური მედია</button>
@@ -287,8 +295,8 @@
           </div>
           <div class="footer-contact">
             <span class="footer-title">სოციალური არხები</span>
-            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
-            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a href="https://www.instagram.com/tbilisigrowthstudio?igsh=N2ViYnp4cmRxdHF6" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://www.facebook.com/tbilisigrowthstudio" target="_blank" rel="noopener noreferrer">Facebook</a>
             <span>თბილისი, საქართველო</span>
           </div>
         </div>
@@ -311,8 +319,8 @@
         </div>
         <div class="modal-copy">
           <span class="eyebrow">ქეისის დეტალები</span>
-          <h2 data-modal-title>Project title</h2>
-          <p class="lead" data-modal-subtitle>Project summary</p>
+          <h2 data-modal-title>პროექტის სათაური</h2>
+          <p class="lead" data-modal-subtitle>პროექტის მოკლე აღწერა</p>
           <ul class="modal-list">
             <li><span>პრობლემა</span><p data-modal-problem></p></li>
             <li><span>გადაწყვეტა</span><p data-modal-solution></p></li>
@@ -328,4 +336,3 @@
     <script src="script.js"></script>
   </body>
 </html>
-

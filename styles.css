@@ -2988,13 +2988,18 @@ html[lang="ka"] .brandbook-list dt {
 }
 
 .promo-popup-button-primary {
-  color: #10224b;
-  border-color: rgba(255, 224, 176, 0.3);
+  --shatter-border-color: rgba(185, 204, 229, 0.42);
+  --shatter-surface: linear-gradient(90deg, rgba(244, 227, 196, 0.97) 0%, rgba(221, 193, 151, 0.97) 30%, rgba(110, 157, 220, 0.97) 64%, rgba(43, 96, 176, 0.98) 100%);
+  --shatter-shadow-rgb: 14, 43, 96;
+  --shatter-fragment-fill: linear-gradient(150deg, rgba(255, 248, 236, 0.98) 0%, rgba(205, 219, 239, 0.92) 40%, rgba(43, 96, 176, 0.86) 100%);
+  --shatter-fragment-shadow-rgb: 14, 43, 96;
+  color: #17335f;
+  border-color: rgba(185, 204, 229, 0.42);
   background:
-    linear-gradient(90deg, rgba(255, 226, 171, 0.95) 0%, rgba(222, 171, 93, 0.94) 28%, rgba(63, 150, 255, 0.96) 54%, rgba(23, 90, 196, 0.96) 100%);
+    linear-gradient(90deg, rgba(244, 227, 196, 0.97) 0%, rgba(221, 193, 151, 0.97) 30%, rgba(110, 157, 220, 0.97) 64%, rgba(43, 96, 176, 0.98) 100%);
   box-shadow:
-    0 18px 44px rgba(21, 94, 206, 0.3),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    0 18px 42px rgba(14, 43, 96, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
 }
 
 .promo-popup-button-primary::after {
@@ -3002,16 +3007,16 @@ html[lang="ka"] .brandbook-list dt {
   position: absolute;
   inset: 4px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  opacity: 0.7;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  opacity: 0.76;
 }
 
 .promo-popup-button-primary:hover,
 .promo-popup-button-primary:focus-visible {
   transform: translateY(-2px) scale(1.01);
   box-shadow:
-    0 22px 54px rgba(21, 94, 206, 0.38),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    0 22px 54px rgba(14, 43, 96, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
 }
 
 .promo-popup-button-secondary {
@@ -3593,94 +3598,193 @@ html[lang="ka"] .brandbook-list dt {
   filter: drop-shadow(0px 2px 8px rgba(0,0,0,0.3));
 }
 
-/* --- Shatter Button Physics --- */
-.shatter-btn {
+/* --- Dynamic CTA Hover --- */
+.button-primary,
+.button-primary:hover,
+.button-primary:focus-visible,
+.promo-popup-button-primary,
+.promo-popup-button-primary:hover,
+.promo-popup-button-primary:focus-visible {
   position: relative;
-  --shatter-progress: 0;
-  --shatter-flight-progress: 0;
-  --shatter-r: calc(26 - (2 * var(--shatter-progress)));
-  --shatter-g: calc(115 + (13 * var(--shatter-progress)));
-  --shatter-b: calc(232 - (176 * var(--shatter-progress)));
-  overflow: visible !important;
-  perspective: 800px;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s;
-  transform: scale(calc(1 + (var(--shatter-progress) * 0.1)));
+  isolation: isolate;
+  overflow: visible;
+  --hover-progress: 0;
+  --hover-x: 50%;
+  --hover-y: 50%;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --sheen-shift: -20%;
+  --shatter-drift-x: 0px;
+  --shatter-drift-y: 0px;
+  --shatter-border-color: rgba(255, 255, 255, 0.2);
+  --shatter-surface: linear-gradient(135deg, rgb(26, 115, 232) 0%, rgb(33, 134, 214) 42%, rgb(24, 128, 56) 100%);
+  --shatter-shadow-rgb: 16, 78, 160;
+  --shatter-fragment-fill: linear-gradient(150deg, rgba(255, 255, 255, 0.96) 0%, rgba(162, 229, 243, 0.88) 34%, rgba(24, 128, 56, 0.82) 100%);
+  --shatter-fragment-shadow-rgb: 18, 95, 187;
+  border-color: var(--shatter-border-color);
+  background:
+    radial-gradient(circle at var(--hover-x) var(--hover-y), rgba(255, 255, 255, calc(0.18 + (var(--hover-progress) * 0.18))) 0%, rgba(255, 255, 255, 0) 36%),
+    var(--shatter-surface);
+  background-size: 100% 100%, 145% 145%;
+  background-position: 0 0, calc(46% + (var(--hover-progress) * 10%)) 50%;
+  box-shadow:
+    0 10px 24px rgba(var(--shatter-shadow-rgb), calc(0.2 + (var(--hover-progress) * 0.1))),
+    0 18px 42px rgba(var(--shatter-shadow-rgb), calc(0.16 + (var(--hover-progress) * 0.18)));
+  transform:
+    translateY(calc(-1px - (var(--hover-progress) * 3px)))
+    perspective(900px)
+    rotateX(var(--tilt-x))
+    rotateY(var(--tilt-y))
+    scale(calc(1 + (var(--hover-progress) * 0.022)));
+  filter: saturate(calc(1 + (var(--hover-progress) * 0.18)));
+  transition:
+    border-color 260ms ease,
+    background-position 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 360ms ease;
+  will-change: transform, box-shadow, background-position;
 }
 
-.shatter-btn:hover, .shatter-btn:focus-visible {
-  transform: scale(calc(1 + (var(--shatter-progress) * 0.1)));
+.button-primary:hover,
+.button-primary:focus-visible,
+.promo-popup-button-primary:hover,
+.promo-popup-button-primary:focus-visible {
   z-index: 10;
 }
 
-.shatter-backer {
+.button-primary::before,
+.button-primary::after,
+.promo-popup-button-primary::before,
+.promo-popup-button-primary::after {
+  content: "";
   position: absolute;
-  inset: 0;
-  background: rgb(var(--shatter-r), var(--shatter-g), var(--shatter-b));
   border-radius: inherit;
+  pointer-events: none;
+}
+
+.button-primary::before,
+.promo-popup-button-primary::before {
+  inset: 1px;
+  z-index: 0;
+  background: linear-gradient(
+    118deg,
+    rgba(255, 255, 255, 0) 18%,
+    rgba(255, 255, 255, 0.16) 34%,
+    rgba(255, 255, 255, 0.58) 48%,
+    rgba(255, 255, 255, 0.18) 56%,
+    rgba(255, 255, 255, 0) 72%
+  );
+  opacity: calc(0.08 + (var(--hover-progress) * 0.95));
+  transform: translateX(var(--sheen-shift));
+  mix-blend-mode: screen;
+  transition: opacity 240ms ease, transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.button-primary::after,
+.promo-popup-button-primary::after {
+  inset: -14%;
+  z-index: 0;
+  border: 0;
+  background: radial-gradient(circle at var(--hover-x) var(--hover-y), rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0) 56%);
+  opacity: calc(0.14 + (var(--hover-progress) * 0.65));
+  filter: blur(10px);
+  transform: scale(calc(0.9 + (var(--hover-progress) * 0.14)));
+  transition: opacity 260ms ease, transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.shatter-fragments {
+  position: absolute;
+  inset: -26px;
   z-index: 1;
-  opacity: var(--shatter-progress);
-  transform: scale(calc(1 - (var(--shatter-progress) * 0.03)));
-  transition: opacity 0.16s linear, transform 0.16s linear;
-  border: 1px solid rgba(24, 128, 56, calc(0.12 + (var(--shatter-progress) * 0.6)));
+  pointer-events: none;
+}
+
+.shatter-fragment {
+  position: absolute;
+  display: block;
+  background: var(--shatter-fragment-fill);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  opacity: calc(var(--hover-progress) * var(--fragment-opacity, 0.6));
+  transform:
+    translate(-50%, -50%)
+    translate(
+      calc(var(--fragment-x, 0px) * var(--hover-progress)),
+      calc(var(--fragment-y, 0px) * var(--hover-progress))
+    )
+    rotate(calc(var(--fragment-rotate, 0deg) * var(--hover-progress)))
+    scale(calc(0.56 + (var(--hover-progress) * var(--fragment-scale, 0.72))));
+  filter: drop-shadow(0 6px 14px rgba(var(--shatter-fragment-shadow-rgb), 0.3));
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    filter 320ms ease;
+  will-change: transform, opacity;
 }
 
 .shatter-text-layer {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transform: translateZ(calc(20px + (var(--shatter-progress) * 16px)));
+  white-space: nowrap;
+  transform: translate(
+    var(--shatter-drift-x),
+    calc((var(--hover-progress) * -1px) + var(--shatter-drift-y))
+  );
+  text-shadow: 0 1px 0 rgba(0, 0, 0, calc(0.05 + (var(--hover-progress) * 0.08)));
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1), text-shadow 260ms ease;
 }
 
 .shatter-word-set {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.34em;
-  white-space: nowrap;
+  gap: 0.32em;
 }
 
 .shatter-word {
   display: inline-block;
-  will-change: transform, filter;
   transform:
-    translate3d(
-      calc(var(--word-x, 0px) * var(--shatter-progress)),
-      calc(var(--word-y, 0px) * var(--shatter-progress)),
-      calc(var(--word-z, 0px) * var(--shatter-progress))
+    translate(
+      calc((var(--word-x, 0px) * var(--hover-progress)) + (var(--shatter-drift-x) * 0.35)),
+      calc((var(--word-y, 0px) * var(--hover-progress)) + (var(--shatter-drift-y) * 0.35))
     )
-    rotate(calc(var(--word-rotate, 0deg) * var(--shatter-progress)));
-  filter: drop-shadow(0 0 calc(var(--shatter-progress) * 8px) rgba(24, 128, 56, 0.2));
-  transition: transform 0.12s linear, filter 0.12s linear;
+    rotate(calc(var(--word-rotate, 0deg) * var(--hover-progress)));
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, calc(0.08 + (var(--hover-progress) * 0.12))));
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), filter 260ms ease;
+  will-change: transform;
 }
 
-.shards-container {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  transform-style: preserve-3d;
-  opacity: calc(var(--shatter-progress) * 1.1);
+.promo-popup-button-primary {
+  --shatter-border-color: rgba(185, 204, 229, 0.42);
+  --shatter-surface: linear-gradient(90deg, rgba(244, 227, 196, 0.97) 0%, rgba(221, 193, 151, 0.97) 30%, rgba(110, 157, 220, 0.97) 64%, rgba(43, 96, 176, 0.98) 100%);
+  --shatter-shadow-rgb: 14, 43, 96;
+  --shatter-fragment-fill: linear-gradient(150deg, rgba(255, 248, 236, 0.98) 0%, rgba(205, 219, 239, 0.92) 40%, rgba(43, 96, 176, 0.86) 100%);
+  --shatter-fragment-shadow-rgb: 14, 43, 96;
 }
 
-.shard-piece {
-  position: absolute;
-  background: rgb(var(--shatter-r), var(--shatter-g), var(--shatter-b));
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  opacity: calc(0.12 + (var(--shatter-progress) * 0.78));
-  transform:
-    translate(-50%, -50%)
-    translate3d(
-      calc(var(--target-x) * var(--shatter-flight-progress)),
-      calc(var(--target-y) * var(--shatter-flight-progress)),
-      calc(var(--target-z) * var(--shatter-flight-progress))
-    )
-    rotateX(calc(var(--target-rx) * var(--shatter-flight-progress)))
-    rotateY(calc(var(--target-ry) * var(--shatter-flight-progress)))
-    scale(calc(0.25 + (var(--shatter-flight-progress) * 0.9)));
-  will-change: transform, opacity;
-  transition: transform 0.12s linear, opacity 0.12s linear;
+@media (prefers-reduced-motion: reduce) {
+  .button-primary,
+  .button-primary:hover,
+  .button-primary:focus-visible,
+  .promo-popup-button-primary,
+  .promo-popup-button-primary:hover,
+  .promo-popup-button-primary:focus-visible {
+    transform: translateY(-2px);
+    filter: none;
+    transition: border-color 220ms ease, box-shadow 220ms ease, background-position 220ms ease;
+  }
+
+  .button-primary::before,
+  .button-primary::after,
+  .promo-popup-button-primary::before,
+  .promo-popup-button-primary::after,
+  .shatter-fragment,
+  .shatter-text-layer,
+  .shatter-word {
+    transition: none;
+  }
 }
 
 /* --- Tree Graph Ecosystem --- */

@@ -865,151 +865,249 @@ if (contactForm) {
   requestAnimationFrame(animate);
 })();
 
-// --- Interactive Shatter Button Physics ---
+// --- Dynamic CTA Hover Tracking ---
 (function initShatterButtons() {
-  if (window.matchMedia("(pointer: coarse)").matches) return;
+  const shatterButtons = document.querySelectorAll(".button-primary, .promo-popup-button-primary");
+  if (!shatterButtons.length) return;
 
-  const shatterButtons = document.querySelectorAll('.shatter-btn');
+  const finePointerQuery = window.matchMedia("(pointer: fine)");
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const normalizeVector = (x, y) => {
+    const length = Math.hypot(x, y) || 1;
 
-  shatterButtons.forEach(btn => {
-    const labelText = btn.textContent.replace(/\s+/g, ' ').trim();
-    btn.innerHTML = '';
+    return { x: x / length, y: y / length, length };
+  };
+  const seededUnit = (seed) => {
+    const value = Math.sin(seed * 12.9898) * 43758.5453;
 
-    const backer = document.createElement('div');
-    backer.className = 'shatter-backer';
-    btn.appendChild(backer);
+    return value - Math.floor(value);
+  };
+  const resolveEscapeVector = (impactX, impactY, pointerX, pointerY) => {
+    const mixedImpactX = (impactX * 0.78) + (pointerX * 0.22);
+    const mixedImpactY = (impactY * 0.78) + (pointerY * 0.22);
+    const strength = Math.min(Math.hypot(mixedImpactX, mixedImpactY), 1.15);
 
-    const textLayer = document.createElement('span');
-    textLayer.className = 'shatter-text-layer';
+    if (strength < 0.04) {
+      return { x: 0, y: 0, strength: 0, angle: 0 };
+    }
 
-    const wordsWrap = document.createElement('span');
-    wordsWrap.className = 'shatter-word-set';
+    const escape = normalizeVector(-mixedImpactX, -mixedImpactY);
 
-    const words = labelText ? labelText.split(' ') : [''];
-    const midpoint = (words.length - 1) / 2;
-    const wordElements = [];
+    return {
+      x: escape.x,
+      y: escape.y,
+      strength,
+      angle: Math.atan2(escape.y, escape.x)
+    };
+  };
 
-    words.forEach((word, index) => {
-      const wordEl = document.createElement('span');
-      const distanceFromCenter = index - midpoint;
-      const direction = distanceFromCenter === 0 ? (index % 2 === 0 ? -1 : 1) : Math.sign(distanceFromCenter);
-      const magnitude = Math.abs(distanceFromCenter);
-      const translateX = (direction * (16 + (magnitude * 9))) + (distanceFromCenter * 6);
-      const translateY = ((index % 2 === 0 ? -1 : 1) * (10 + (magnitude * 4)));
-      const rotate = direction * (7 + (magnitude * 5));
+  shatterButtons.forEach((btn, buttonIndex) => {
+    if (!btn.querySelector(".shatter-text-layer")) {
+      const textLayer = document.createElement("span");
+      textLayer.className = "shatter-text-layer";
 
-      wordEl.className = 'shatter-word';
-      wordEl.textContent = word;
-      wordEl.dataset.baseX = `${translateX}`;
-      wordEl.dataset.baseY = `${translateY}`;
-      wordEl.style.setProperty('--word-rotate', `${rotate}deg`);
-      wordEl.style.setProperty('--word-z', `${12 + (magnitude * 12)}px`);
+      while (btn.firstChild) {
+        textLayer.appendChild(btn.firstChild);
+      }
 
-      wordsWrap.appendChild(wordEl);
-      wordElements.push(wordEl);
-    });
+      btn.appendChild(textLayer);
+    }
 
-    textLayer.appendChild(wordsWrap);
-    btn.appendChild(textLayer);
+    const textLayer = btn.querySelector(".shatter-text-layer");
 
-    const shardsContainer = document.createElement('div');
-    shardsContainer.className = 'shards-container';
-    btn.appendChild(shardsContainer);
+    if (textLayer && !textLayer.querySelector(".shatter-word-set")) {
+      const labelText = textLayer.textContent.replace(/\s+/g, " ").trim();
+      const wordsWrap = document.createElement("span");
+      const words = labelText ? labelText.split(" ") : [""];
+      const midpoint = (words.length - 1) / 2;
 
-    let currentProgress = 0;
-    let targetProgress = 0;
-    let rafId = 0;
-    let layoutKey = '';
+      wordsWrap.className = "shatter-word-set";
+      textLayer.textContent = "";
 
-    const calibrateWordMotion = () => {
-      const btnRect = btn.getBoundingClientRect();
-      if (!btnRect.width || !btnRect.height) return;
+      words.forEach((word, index) => {
+        const wordEl = document.createElement("span");
+        const distanceFromCenter = index - midpoint;
+        const direction = distanceFromCenter === 0 ? (index % 2 === 0 ? -1 : 1) : Math.sign(distanceFromCenter);
+        const magnitude = Math.abs(distanceFromCenter);
 
-      const insetX = Math.min(18, Math.max(10, btnRect.width * 0.06));
-      const insetY = Math.min(12, Math.max(6, btnRect.height * 0.16));
+        wordEl.className = "shatter-word";
+        wordEl.textContent = word;
+        wordEl.style.setProperty("--word-x", `${(direction * (6 + (magnitude * 4))) + (distanceFromCenter * 2)}px`);
+        wordEl.style.setProperty("--word-y", `${(index % 2 === 0 ? -1 : 1) * (2.8 + (magnitude * 2.2))}px`);
+        wordEl.style.setProperty("--word-rotate", `${direction * (2.6 + (magnitude * 1.9))}deg`);
 
-      wordElements.forEach(wordEl => {
-        const rect = wordEl.getBoundingClientRect();
-        const desiredX = Number(wordEl.dataset.baseX || 0);
-        const desiredY = Number(wordEl.dataset.baseY || 0);
-        const maxLeft = Math.max(0, rect.left - btnRect.left - insetX);
-        const maxRight = Math.max(0, btnRect.right - rect.right - insetX);
-        const maxUp = Math.max(0, rect.top - btnRect.top - insetY);
-        const maxDown = Math.max(0, btnRect.bottom - rect.bottom - insetY);
-        const resolvedX = clamp(desiredX, -maxLeft, maxRight);
-        const resolvedY = clamp(desiredY, -maxUp, maxDown);
-
-        wordEl.style.setProperty('--word-x', `${resolvedX}px`);
-        wordEl.style.setProperty('--word-y', `${resolvedY}px`);
+        wordsWrap.appendChild(wordEl);
       });
+
+      textLayer.appendChild(wordsWrap);
+    }
+
+    let fragmentsContainer = btn.querySelector(".shatter-fragments");
+
+    if (!fragmentsContainer) {
+      fragmentsContainer = document.createElement("span");
+      fragmentsContainer.className = "shatter-fragments";
+      btn.insertBefore(fragmentsContainer, textLayer);
+    }
+
+    const currentState = {
+      progress: 0,
+      x: 50,
+      y: 50,
+      tiltX: 0,
+      tiltY: 0,
+      sheenShift: -20,
+      driftX: 0,
+      driftY: 0,
+      impactX: 0,
+      impactY: 0,
+      pointerX: 0,
+      pointerY: 0
     };
 
-    const buildShards = () => {
+    const targetState = { ...currentState };
+    const fragmentMeta = [];
+    let rafId = 0;
+    let layoutKey = "";
+
+    const buildFragments = () => {
       const rect = btn.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
 
       const nextLayoutKey = `${Math.round(rect.width)}x${Math.round(rect.height)}`;
-      if (layoutKey === nextLayoutKey && shardsContainer.childElementCount) return;
+      if (nextLayoutKey === layoutKey && fragmentMeta.length) return;
 
       layoutKey = nextLayoutKey;
-      shardsContainer.innerHTML = '';
+      fragmentMeta.length = 0;
+      fragmentsContainer.innerHTML = "";
 
-      const SHARDS = 35;
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
+      const orbitX = (rect.width / 2) + 10;
+      const orbitY = (rect.height / 2) + 8;
+      const fragmentCount = Math.round(clamp(rect.width / 9, 16, 24));
 
-      for (let i = 0; i < SHARDS; i++) {
-        const shard = document.createElement('div');
-        shard.className = 'shard-piece';
+      for (let index = 0; index < fragmentCount; index += 1) {
+        const seed = ((buttonIndex + 1) * 97) + index + 1;
+        const radialNoise = seededUnit(seed + 0.17);
+        const heightNoise = seededUnit(seed + 0.37);
+        const driftNoise = seededUnit(seed + 0.61);
+        const spinNoise = seededUnit(seed + 0.83);
+        const opacityNoise = seededUnit(seed + 1.09);
+        const theta = ((index / fragmentCount) * Math.PI * 2) - (Math.PI / 2);
+        const orbitOffset = (radialNoise - 0.5) * 10;
+        const originX = centerX + (Math.cos(theta) * (orbitX + orbitOffset));
+        const originY = centerY + (Math.sin(theta) * (orbitY + (orbitOffset * 0.6)));
+        const size = 8 + (radialNoise * 10);
+        const fragment = document.createElement("span");
 
-        const startX = Math.random() * rect.width;
-        const startY = Math.random() * rect.height;
-        const dx = startX - centerX;
-        const dy = startY - centerY;
-        const dist = Math.hypot(dx, dy) || 1;
-        const spread = 24 + Math.random() * 42 + dist * 0.16;
-        const pushX = (dx / dist) * spread + (Math.random() - 0.5) * 18;
-        const pushY = (dy / dist) * spread + (Math.random() - 0.5) * 18;
-        const pushZ = Math.random() * 110 + 16;
-        const rotX = (Math.random() - 0.5) * 260;
-        const rotY = (Math.random() - 0.5) * 260;
-        const size = Math.random() * 12 + 5;
+        fragment.className = "shatter-fragment";
+        fragment.style.left = `${originX.toFixed(2)}px`;
+        fragment.style.top = `${originY.toFixed(2)}px`;
+        fragment.style.width = `${size.toFixed(2)}px`;
+        fragment.style.height = `${(size * (0.72 + (heightNoise * 0.42))).toFixed(2)}px`;
 
-        shard.style.left = `${startX}px`;
-        shard.style.top = `${startY}px`;
-        shard.style.width = `${size}px`;
-        shard.style.height = `${size}px`;
-        shard.style.setProperty('--target-x', `${pushX}px`);
-        shard.style.setProperty('--target-y', `${pushY}px`);
-        shard.style.setProperty('--target-z', `${pushZ}px`);
-        shard.style.setProperty('--target-rx', `${rotX}deg`);
-        shard.style.setProperty('--target-ry', `${rotY}deg`);
-
-        shardsContainer.appendChild(shard);
+        fragmentsContainer.appendChild(fragment);
+        fragmentMeta.push({
+          element: fragment,
+          angle: theta,
+          burst: 20 + (radialNoise * 28),
+          drift: -8 + (driftNoise * 16),
+          spin: -95 + (spinNoise * 190),
+          scale: 0.54 + (heightNoise * 0.82),
+          opacity: 0.36 + (opacityNoise * 0.46)
+        });
       }
     };
 
-    const setProgress = (value) => {
-      const nextProgress = clamp(value, 0, 1);
-      btn.style.setProperty('--shatter-progress', nextProgress.toFixed(4));
-      btn.style.setProperty('--shatter-flight-progress', Math.pow(nextProgress, 1.45).toFixed(4));
+    const updateFragments = (nx = 0, ny = 0, impactX = nx, impactY = ny) => {
+      const pointerStrength = Math.min(Math.hypot(nx, ny), 1.15);
+      const escapeVector = resolveEscapeVector(impactX, impactY, nx, ny);
+      const sweepVector = pointerStrength < 0.04
+        ? normalizeVector(-escapeVector.y || 0.001, escapeVector.x || 0.001)
+        : normalizeVector(-ny, nx);
+
+      fragmentMeta.forEach((fragment, index) => {
+        const oppositeBias = escapeVector.strength < 0.04
+          ? 0.72
+          : clamp((Math.cos(fragment.angle - escapeVector.angle) + 1) / 2, 0.08, 1);
+        const impactBias = escapeVector.strength < 0.04
+          ? 0.24
+          : clamp((Math.cos(fragment.angle - (escapeVector.angle + Math.PI)) + 1) / 2, 0, 1);
+        const outward = fragment.burst * (0.34 + (oppositeBias * 1.5));
+        const tangentX = -Math.sin(fragment.angle);
+        const tangentY = Math.cos(fragment.angle);
+        const globalEscape = escapeVector.strength < 0.04 ? 0 : 10 + (escapeVector.strength * 18);
+        const sweep = pointerStrength < 0.04 ? 0 : 4 + (pointerStrength * 9);
+        const escapePush = globalEscape * (0.52 + (oppositeBias * 0.94));
+        const recoilDrag = 2 + (impactBias * 8);
+        const spinBias = (index % 2 === 0 ? 1 : -1) * (
+          (escapeVector.x * 58) +
+          (escapeVector.y * 38) +
+          (pointerStrength * 16)
+        );
+        const x =
+          (Math.cos(fragment.angle) * outward) +
+          (tangentX * fragment.drift) +
+          (sweepVector.x * sweep * (0.18 + (oppositeBias * 0.34))) +
+          (escapeVector.x * escapePush) -
+          (Math.cos(fragment.angle) * recoilDrag * impactBias);
+        const y =
+          (Math.sin(fragment.angle) * outward) +
+          (tangentY * fragment.drift) +
+          (sweepVector.y * sweep * (0.18 + (oppositeBias * 0.34))) +
+          (escapeVector.y * escapePush) -
+          (Math.sin(fragment.angle) * recoilDrag * impactBias);
+
+        fragment.element.style.setProperty("--fragment-x", `${x.toFixed(2)}px`);
+        fragment.element.style.setProperty("--fragment-y", `${y.toFixed(2)}px`);
+        fragment.element.style.setProperty("--fragment-rotate", `${(fragment.spin + spinBias).toFixed(2)}deg`);
+        fragment.element.style.setProperty("--fragment-scale", `${(fragment.scale * (0.84 + (oppositeBias * 0.28))).toFixed(3)}`);
+        fragment.element.style.setProperty("--fragment-opacity", `${(fragment.opacity * (0.4 + (oppositeBias * 0.86)) * (1 - (impactBias * 0.12))).toFixed(3)}`);
+      });
+    };
+
+    const applyState = () => {
+      btn.style.setProperty("--hover-progress", currentState.progress.toFixed(4));
+      btn.style.setProperty("--hover-x", `${currentState.x.toFixed(2)}%`);
+      btn.style.setProperty("--hover-y", `${currentState.y.toFixed(2)}%`);
+      btn.style.setProperty("--tilt-x", `${currentState.tiltX.toFixed(2)}deg`);
+      btn.style.setProperty("--tilt-y", `${currentState.tiltY.toFixed(2)}deg`);
+      btn.style.setProperty("--sheen-shift", `${currentState.sheenShift.toFixed(2)}%`);
+      btn.style.setProperty("--shatter-drift-x", `${currentState.driftX.toFixed(2)}px`);
+      btn.style.setProperty("--shatter-drift-y", `${currentState.driftY.toFixed(2)}px`);
     };
 
     const tick = () => {
-      currentProgress += (targetProgress - currentProgress) * 0.2;
+      currentState.progress += (targetState.progress - currentState.progress) * 0.16;
+      currentState.x += (targetState.x - currentState.x) * 0.18;
+      currentState.y += (targetState.y - currentState.y) * 0.18;
+      currentState.tiltX += (targetState.tiltX - currentState.tiltX) * 0.14;
+      currentState.tiltY += (targetState.tiltY - currentState.tiltY) * 0.14;
+      currentState.sheenShift += (targetState.sheenShift - currentState.sheenShift) * 0.16;
+      currentState.driftX += (targetState.driftX - currentState.driftX) * 0.18;
+      currentState.driftY += (targetState.driftY - currentState.driftY) * 0.18;
 
-      if (Math.abs(targetProgress - currentProgress) < 0.001) {
-        currentProgress = targetProgress;
-      }
+      const isSettled =
+        Math.abs(targetState.progress - currentState.progress) < 0.001 &&
+        Math.abs(targetState.x - currentState.x) < 0.01 &&
+        Math.abs(targetState.y - currentState.y) < 0.01 &&
+        Math.abs(targetState.tiltX - currentState.tiltX) < 0.01 &&
+        Math.abs(targetState.tiltY - currentState.tiltY) < 0.01 &&
+        Math.abs(targetState.sheenShift - currentState.sheenShift) < 0.01 &&
+        Math.abs(targetState.driftX - currentState.driftX) < 0.01 &&
+        Math.abs(targetState.driftY - currentState.driftY) < 0.01;
 
-      setProgress(currentProgress);
-
-      if (Math.abs(targetProgress - currentProgress) >= 0.001 || currentProgress > 0.001) {
-        rafId = requestAnimationFrame(tick);
-      } else {
+      if (isSettled) {
+        Object.assign(currentState, targetState);
+        applyState();
         rafId = 0;
+        return;
       }
+
+      applyState();
+      rafId = requestAnimationFrame(tick);
     };
 
     const ensureTick = () => {
@@ -1018,53 +1116,100 @@ if (contactForm) {
       }
     };
 
-    const resolvePointerProgress = (event) => {
+    const setTargetFromPoint = (clientX, clientY, strength = 1, isEntry = false) => {
       const rect = btn.getBoundingClientRect();
-      if (!rect.width || !rect.height) return 0;
+      if (!rect.width || !rect.height) return;
 
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const nx = (x - rect.width / 2) / (rect.width / 2);
-      const ny = (y - rect.height / 2) / (rect.height / 2);
-      const radialDistance = Math.sqrt((nx * nx) + (ny * ny));
-      const edgeToCenterProgress = clamp(1 - radialDistance, 0, 1);
+      const localX = clamp(clientX - rect.left, 0, rect.width);
+      const localY = clamp(clientY - rect.top, 0, rect.height);
+      const px = localX / rect.width;
+      const py = localY / rect.height;
+      const nx = (px * 2) - 1;
+      const ny = (py * 2) - 1;
+      const distance = Math.min(Math.hypot(nx, ny), 1.3);
+      const energy = clamp(1 - (distance * 0.58), 0.3, 1);
 
-      return Math.pow(edgeToCenterProgress, 0.8);
-    };
-
-    const updateFromPointer = (event) => {
-      buildShards();
-      targetProgress = resolvePointerProgress(event);
+      targetState.progress = clamp((0.45 + (energy * 0.55)) * strength, 0, 1);
+      targetState.x = clamp(px * 100, 14, 86);
+      targetState.y = clamp(py * 100, 18, 82);
+      targetState.tiltX = clamp(ny * -4.5 * strength, -4.5, 4.5);
+      targetState.tiltY = clamp(nx * 6.5 * strength, -6.5, 6.5);
+      targetState.sheenShift = clamp(-26 + (px * 64), -26, 38);
+      if (isEntry || Math.hypot(targetState.impactX, targetState.impactY) < 0.04) {
+        targetState.impactX = nx;
+        targetState.impactY = ny;
+      } else {
+        targetState.impactX = (targetState.impactX * 0.88) + (nx * 0.12);
+        targetState.impactY = (targetState.impactY * 0.88) + (ny * 0.12);
+      }
+      const escapeVector = resolveEscapeVector(targetState.impactX, targetState.impactY, nx, ny);
+      targetState.driftX = escapeVector.x * (2.6 + (escapeVector.strength * 6.6)) * strength;
+      targetState.driftY = escapeVector.y * (1.8 + (escapeVector.strength * 5.4)) * strength;
+      targetState.pointerX = nx;
+      targetState.pointerY = ny;
+      buildFragments();
+      updateFragments(nx, ny, targetState.impactX, targetState.impactY);
       ensureTick();
     };
 
-    btn.addEventListener('pointerenter', updateFromPointer);
-    btn.addEventListener('pointermove', updateFromPointer);
-    btn.addEventListener('pointerleave', () => {
-      targetProgress = 0;
+    const activateCentered = (strength = 1) => {
+      const rect = btn.getBoundingClientRect();
+      setTargetFromPoint(rect.left + (rect.width / 2), rect.top + (rect.height / 2), strength);
+    };
+
+    const resetTarget = () => {
+      targetState.progress = 0;
+      targetState.x = 50;
+      targetState.y = 50;
+      targetState.tiltX = 0;
+      targetState.tiltY = 0;
+      targetState.sheenShift = -20;
+      targetState.driftX = 0;
+      targetState.driftY = 0;
+      targetState.impactX = 0;
+      targetState.impactY = 0;
+      targetState.pointerX = 0;
+      targetState.pointerY = 0;
+      updateFragments(0, 0, 0, 0);
       ensureTick();
+    };
+
+    if (!reducedMotionQuery.matches && finePointerQuery.matches) {
+      btn.addEventListener("pointerenter", (event) => {
+        setTargetFromPoint(event.clientX, event.clientY, 1, true);
+      });
+
+      btn.addEventListener("pointermove", (event) => {
+        setTargetFromPoint(event.clientX, event.clientY);
+      });
+
+      btn.addEventListener("pointerleave", resetTarget);
+    }
+
+    btn.addEventListener("focus", () => {
+      activateCentered(1);
     });
 
-    btn.addEventListener('focus', () => {
-      buildShards();
-      targetProgress = 1;
-      ensureTick();
+    btn.addEventListener("blur", resetTarget);
+
+    const handleCapabilityChange = () => {
+      if (reducedMotionQuery.matches || !finePointerQuery.matches) {
+        resetTarget();
+      }
+    };
+
+    finePointerQuery.addEventListener?.("change", handleCapabilityChange);
+    reducedMotionQuery.addEventListener?.("change", handleCapabilityChange);
+
+    window.addEventListener("resize", () => {
+      layoutKey = "";
+      buildFragments();
+      updateFragments(targetState.pointerX, targetState.pointerY, targetState.impactX, targetState.impactY);
     });
 
-    btn.addEventListener('blur', () => {
-      targetProgress = 0;
-      ensureTick();
-    });
-
-    window.addEventListener('resize', () => {
-      layoutKey = '';
-      calibrateWordMotion();
-      buildShards();
-      setProgress(currentProgress);
-    });
-
-    calibrateWordMotion();
-    setProgress(0);
+    buildFragments();
+    updateFragments(0, 0, 0, 0);
+    applyState();
   });
 })();
 
