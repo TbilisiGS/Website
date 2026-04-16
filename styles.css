@@ -139,9 +139,17 @@ button {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  perspective: 1800px;
+  transform-style: preserve-3d;
   --hero-bulge-x: 50%;
   --hero-bulge-y: 34%;
   --hero-bulge-strength: 0;
+  --hero-bulge-depth: 0;
+  --hero-bulge-surge: 0;
+  --hero-bulge-tilt-x: 0deg;
+  --hero-bulge-tilt-y: 0deg;
+  --hero-bulge-stretch-x: 1;
+  --hero-bulge-stretch-y: 1;
   --hero-bulge-drift-x: 0px;
   --hero-bulge-drift-y: 0px;
 }
@@ -150,73 +158,200 @@ button {
 .page-hero.hero-cursor-reactive::after {
   content: "";
   position: absolute;
-  inset: -12% -6%;
+  left: var(--hero-bulge-x);
+  top: var(--hero-bulge-y);
+  width: clamp(210px, calc(205px + (var(--hero-bulge-depth) * 110px) + (var(--hero-bulge-surge) * 120px)), 350px);
+  height: clamp(210px, calc(205px + (var(--hero-bulge-depth) * 110px) + (var(--hero-bulge-surge) * 120px)), 350px);
+  border-radius: 50%;
   z-index: 0;
   pointer-events: none;
+  will-change: transform, opacity, filter;
 }
 
 .page-hero.hero-cursor-reactive::before {
   background:
-    radial-gradient(circle at 14% 18%, rgba(240, 223, 176, 0.22) 0%, rgba(240, 223, 176, 0) 26%),
-    radial-gradient(circle at 86% 22%, rgba(103, 214, 255, 0.18) 0%, rgba(103, 214, 255, 0) 25%),
     radial-gradient(
-      circle at var(--hero-bulge-x) var(--hero-bulge-y),
-      rgba(255, 255, 255, calc(0.06 + (var(--hero-bulge-strength) * 0.22))) 0%,
-      rgba(246, 233, 205, calc(var(--hero-bulge-strength) * 0.22)) 14%,
-      rgba(103, 214, 255, calc(var(--hero-bulge-strength) * 0.1)) 26%,
-      rgba(103, 214, 255, 0) 48%
+      circle at 30% 24%,
+      rgba(255, 255, 255, calc(0.18 + (var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.22))) 0%,
+      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.24) + (var(--hero-bulge-surge) * 0.1))) 12%,
+      rgba(255, 255, 255, 0) 30%
     ),
-    linear-gradient(180deg, rgba(252, 249, 242, 0.96) 0%, rgba(255, 255, 255, 0.92) 100%);
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, calc(0.05 + (var(--hero-bulge-depth) * 0.16) + (var(--hero-bulge-surge) * 0.14))) 0%,
+      rgba(255, 247, 229, calc((var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.1))) 18%,
+      rgba(211, 229, 255, calc((var(--hero-bulge-depth) * 0.28) + (var(--hero-bulge-surge) * 0.08))) 40%,
+      rgba(119, 161, 229, calc((var(--hero-bulge-depth) * 0.16) + (var(--hero-bulge-surge) * 0.06))) 58%,
+      rgba(86, 123, 192, 0) 78%
+    ),
+    radial-gradient(
+      circle at 72% 76%,
+      rgba(15, 26, 55, calc((var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.08))) 0%,
+      rgba(15, 26, 55, calc(var(--hero-bulge-depth) * 0.12)) 18%,
+      rgba(15, 26, 55, 0) 44%
+    ),
+    linear-gradient(
+      140deg,
+      rgba(255, 255, 255, calc(var(--hero-bulge-depth) * 0.18)) 8%,
+      rgba(255, 255, 255, 0) 42%,
+      rgba(26, 50, 96, calc(var(--hero-bulge-depth) * 0.08)) 100%
+    );
   transform:
-    translate3d(calc(var(--hero-bulge-drift-x) * 0.18), calc(var(--hero-bulge-drift-y) * 0.18), 0)
-    scale(calc(1 + (var(--hero-bulge-strength) * 0.06)));
-  transform-origin: var(--hero-bulge-x) var(--hero-bulge-y);
-  opacity: calc(0.88 + (var(--hero-bulge-strength) * 0.12));
-  transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1), opacity 720ms ease;
+    perspective(1800px)
+    translate3d(
+      calc(-50% + (var(--hero-bulge-drift-x) * 0.3)),
+      calc(-50% + (var(--hero-bulge-drift-y) * 0.3)),
+      calc((var(--hero-bulge-depth) * 118px) + (var(--hero-bulge-surge) * 38px))
+    )
+    rotateX(calc(var(--hero-bulge-tilt-x) * 1.05))
+    rotateY(calc(var(--hero-bulge-tilt-y) * 1.05))
+    scale(calc(0.54 + (var(--hero-bulge-depth) * 0.3) + (var(--hero-bulge-surge) * 0.16)));
+  transform-origin: center;
+  filter:
+    blur(calc(10px - (var(--hero-bulge-depth) * 2.8px) - (var(--hero-bulge-surge) * 1.5px)))
+    saturate(calc(1 + (var(--hero-bulge-depth) * 0.32) + (var(--hero-bulge-surge) * 0.14)))
+    contrast(calc(1 + (var(--hero-bulge-depth) * 0.18)));
+  -webkit-backdrop-filter:
+    blur(calc(14px + (var(--hero-bulge-depth) * 7px) + (var(--hero-bulge-surge) * 2px)))
+    saturate(calc(1.04 + (var(--hero-bulge-depth) * 0.28)));
+  backdrop-filter:
+    blur(calc(14px + (var(--hero-bulge-depth) * 7px) + (var(--hero-bulge-surge) * 2px)))
+    saturate(calc(1.04 + (var(--hero-bulge-depth) * 0.28)));
+  box-shadow:
+    inset 0 20px 30px rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.08))),
+    inset 0 -28px 36px rgba(6, 16, 39, calc((var(--hero-bulge-depth) * 0.24) + (var(--hero-bulge-surge) * 0.06))),
+    inset 12px 10px 18px rgba(255, 255, 255, calc(var(--hero-bulge-depth) * 0.08)),
+    -8px -8px 18px rgba(255, 255, 255, calc(var(--hero-bulge-depth) * 0.12)),
+    0 18px 36px rgba(64, 98, 168, calc((var(--hero-bulge-depth) * 0.12) + (var(--hero-bulge-surge) * 0.04)));
+  opacity: calc((var(--hero-bulge-depth) * 0.74) + (var(--hero-bulge-surge) * 0.16));
+  transition:
+    transform 1250ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 720ms ease,
+    backdrop-filter 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    -webkit-backdrop-filter 1100ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .page-hero.hero-cursor-reactive::after {
   background:
     radial-gradient(
-      circle at var(--hero-bulge-x) var(--hero-bulge-y),
-      rgba(255, 255, 255, calc(var(--hero-bulge-strength) * 0.18)) 0%,
-      rgba(255, 255, 255, calc(var(--hero-bulge-strength) * 0.08)) 18%,
-      rgba(255, 255, 255, 0) 34%
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.08))) 61%,
+      rgba(165, 201, 255, calc(var(--hero-bulge-depth) * 0.16)) 68%,
+      rgba(17, 31, 70, calc((var(--hero-bulge-depth) * 0.18) + (var(--hero-bulge-surge) * 0.05))) 82%,
+      rgba(17, 31, 70, 0) 94%
     ),
     radial-gradient(
-      circle at calc(var(--hero-bulge-x) + 4%) calc(var(--hero-bulge-y) + 3%),
-      rgba(215, 178, 109, calc(var(--hero-bulge-strength) * 0.2)) 0%,
-      rgba(215, 178, 109, 0) 30%
+      circle at 28% 24%,
+      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.88) + (var(--hero-bulge-surge) * 0.22))) 0%,
+      rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.24) + (var(--hero-bulge-surge) * 0.08))) 14%,
+      rgba(255, 255, 255, 0) 28%
+    ),
+    radial-gradient(
+      circle at 76% 78%,
+      rgba(7, 15, 36, calc((var(--hero-bulge-depth) * 0.34) + (var(--hero-bulge-surge) * 0.08))) 0%,
+      rgba(7, 15, 36, 0) 28%
     );
+  border: 1px solid rgba(255, 255, 255, calc(0.08 + (var(--hero-bulge-depth) * 0.18) + (var(--hero-bulge-surge) * 0.08)));
   transform:
-    translate3d(calc(var(--hero-bulge-drift-x) * 0.34), calc(var(--hero-bulge-drift-y) * 0.34), 0)
-    scale(calc(0.9 + (var(--hero-bulge-strength) * 0.22)));
-  transform-origin: var(--hero-bulge-x) var(--hero-bulge-y);
-  filter: blur(calc(30px - (var(--hero-bulge-strength) * 10px)));
-  opacity: calc(0.08 + (var(--hero-bulge-strength) * 0.82));
+    perspective(1800px)
+    translate3d(
+      calc(-50% + (var(--hero-bulge-drift-x) * 0.46)),
+      calc(-50% + (var(--hero-bulge-drift-y) * 0.46)),
+      calc((var(--hero-bulge-depth) * 148px) + (var(--hero-bulge-surge) * 46px))
+    )
+    rotateX(calc(var(--hero-bulge-tilt-x) * 1.16))
+    rotateY(calc(var(--hero-bulge-tilt-y) * 1.16))
+    scale(calc(0.62 + (var(--hero-bulge-depth) * 0.32) + (var(--hero-bulge-surge) * 0.18)));
+  transform-origin: center;
+  box-shadow:
+    inset 0 2px 6px rgba(255, 255, 255, calc((var(--hero-bulge-depth) * 0.28) + (var(--hero-bulge-surge) * 0.1))),
+    inset 0 -14px 18px rgba(11, 21, 47, calc((var(--hero-bulge-depth) * 0.22) + (var(--hero-bulge-surge) * 0.06))),
+    0 0 22px rgba(255, 249, 233, calc((var(--hero-bulge-depth) * 0.14) + (var(--hero-bulge-surge) * 0.08)));
+  filter:
+    blur(calc(4px - (var(--hero-bulge-depth) * 0.8px)))
+    drop-shadow(0 0 18px rgba(255, 244, 214, calc((var(--hero-bulge-depth) * 0.2) + (var(--hero-bulge-surge) * 0.08))));
+  opacity: calc((var(--hero-bulge-depth) * 0.86) + (var(--hero-bulge-surge) * 0.16));
   transition:
-    transform 1250ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 1250ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1380ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 1180ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1180ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 650ms ease;
 }
 
 .page-hero.hero-cursor-reactive .hero-grid {
   position: relative;
   z-index: 1;
+  transform-style: preserve-3d;
+}
+
+.page-hero.hero-cursor-reactive .hero-copy {
+  transform:
+    translate3d(
+      calc(var(--hero-bulge-drift-x) * -0.12),
+      calc(var(--hero-bulge-drift-y) * -0.08),
+      calc((var(--hero-bulge-depth) * 20px) + (var(--hero-bulge-surge) * 8px))
+    );
+  transition: transform 1150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-hero.hero-cursor-reactive .hero-visual {
+  transform:
+    translate3d(
+      calc(var(--hero-bulge-drift-x) * 0.13),
+      calc(var(--hero-bulge-drift-y) * 0.11),
+      calc((var(--hero-bulge-depth) * 28px) + (var(--hero-bulge-surge) * 12px))
+    );
+  transition: transform 1220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-hero.hero-cursor-reactive .hero-photo-frame {
+  transform:
+    rotate(-4deg)
+    translate3d(
+      calc(var(--hero-bulge-drift-x) * 0.18),
+      calc(var(--hero-bulge-drift-y) * 0.15),
+      calc((var(--hero-bulge-depth) * 46px) + (var(--hero-bulge-surge) * 14px))
+    )
+    rotateX(calc(var(--hero-bulge-tilt-x) * 0.52))
+    rotateY(calc(var(--hero-bulge-tilt-y) * 0.52))
+    scale(calc(1 + (var(--hero-bulge-depth) * 0.05) + (var(--hero-bulge-surge) * 0.018)));
+  transition:
+    transform 1280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-hero.hero-cursor-reactive .hero-visual-image {
+  filter:
+    saturate(calc(1 + (var(--hero-bulge-depth) * 0.12) + (var(--hero-bulge-surge) * 0.04)))
+    brightness(calc(1 + (var(--hero-bulge-depth) * 0.04)));
+  transition: filter 900ms ease;
 }
 
 .page-hero.hero-cursor-reactive .orb-a {
   transform:
-    translate3d(calc(var(--hero-bulge-drift-x) * 0.24), calc(var(--hero-bulge-drift-y) * 0.24), 0)
-    scale(calc(1 + (var(--hero-bulge-strength) * 0.04)));
-  transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1), opacity 520ms ease;
+    translate3d(
+      calc(var(--hero-bulge-drift-x) * 0.36),
+      calc(var(--hero-bulge-drift-y) * 0.36),
+      calc((var(--hero-bulge-depth) * 24px) + (var(--hero-bulge-surge) * 8px))
+    )
+    scale(calc(1 + (var(--hero-bulge-depth) * 0.12) + (var(--hero-bulge-surge) * 0.04)));
+  opacity: calc(0.66 + (var(--hero-bulge-depth) * 0.18));
+  transition: transform 1200ms cubic-bezier(0.22, 1, 0.36, 1), opacity 640ms ease;
 }
 
 .page-hero.hero-cursor-reactive .orb-b {
   transform:
-    translate3d(calc(var(--hero-bulge-drift-x) * -0.18), calc(var(--hero-bulge-drift-y) * -0.18), 0)
-    scale(calc(1 + (var(--hero-bulge-strength) * 0.05)));
-  transition: transform 1180ms cubic-bezier(0.22, 1, 0.36, 1), opacity 520ms ease;
+    translate3d(
+      calc(var(--hero-bulge-drift-x) * -0.28),
+      calc(var(--hero-bulge-drift-y) * -0.28),
+      calc((var(--hero-bulge-depth) * -16px) - (var(--hero-bulge-surge) * 4px))
+    )
+    scale(calc(1 + (var(--hero-bulge-depth) * 0.12) + (var(--hero-bulge-surge) * 0.04)));
+  opacity: calc(0.66 + (var(--hero-bulge-depth) * 0.16));
+  transition: transform 1280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 640ms ease;
 }
 
 .eyebrow {
@@ -2997,7 +3132,7 @@ html[lang="ka"] .brandbook-list dt {
 .promo-popup-title {
   display: grid;
   gap: 0.25rem;
-  max-width: 12ch;
+  max-width: 20ch;
 }
 
 .promo-popup-title-top,
@@ -3021,6 +3156,7 @@ html[lang="ka"] .brandbook-list dt {
   font-weight: 800;
   line-height: 0.94;
   letter-spacing: -0.05em;
+  white-space: normal;
   color: #f4f7ff;
   text-shadow:
     0 5px 0 rgba(23, 10, 57, 0.42),
@@ -3687,7 +3823,7 @@ html[lang="ka"] .brandbook-list dt {
 .dynamic-button:focus-visible {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  overflow: visible;
   --hover-progress: 0;
   --hover-x: 50%;
   --hover-y: 50%;
@@ -3695,6 +3831,7 @@ html[lang="ka"] .brandbook-list dt {
   --tilt-y: 0deg;
   --sheen-shift: -18%;
   --trim-start: 12px;
+  --dynamic-stroke-outset: 7px;
   --dynamic-button-border: rgba(255, 255, 255, 0.2);
   --dynamic-button-surface: linear-gradient(135deg, rgb(26, 115, 232) 0%, rgb(32, 137, 221) 46%, rgb(24, 128, 56) 100%);
   --dynamic-button-shadow-rgb: 16, 78, 160;
@@ -3785,12 +3922,16 @@ html[lang="ka"] .brandbook-list dt {
 
 .dynamic-button-stroke {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+  inset: calc(var(--dynamic-stroke-outset) * -1);
+  width: calc(100% + (var(--dynamic-stroke-outset) * 2));
+  height: calc(100% + (var(--dynamic-stroke-outset) * 2));
+  z-index: 3;
   pointer-events: none;
   overflow: visible;
+  filter:
+    drop-shadow(0 0 1px rgba(255, 247, 229, 0.96))
+    drop-shadow(0 0 10px rgba(233, 187, 82, 0.42))
+    drop-shadow(0 0 18px rgba(197, 127, 19, 0.18));
 }
 
 .dynamic-button-stroke-track,
@@ -3802,25 +3943,35 @@ html[lang="ka"] .brandbook-list dt {
 }
 
 .dynamic-button-stroke-track {
-  stroke: rgba(255, 242, 213, 0.18);
-  opacity: calc(0.22 + (var(--hover-progress) * 0.2));
+  stroke: rgba(255, 234, 191, 0.14);
+  opacity: calc(0.16 + (var(--hover-progress) * 0.22));
   transition: opacity 280ms ease;
 }
 
 .dynamic-button-stroke-echo {
   opacity: 0;
-  filter: drop-shadow(0 0 10px rgba(229, 187, 94, 0.38));
+  filter:
+    drop-shadow(0 0 4px rgba(255, 250, 239, 0.94))
+    drop-shadow(0 0 12px rgba(255, 219, 129, 0.92))
+    drop-shadow(0 0 24px rgba(214, 146, 34, 0.5));
   transition: opacity 240ms ease;
 }
 
 .dynamic-button-stroke-resolve {
   opacity: 0;
-  filter: drop-shadow(0 0 8px rgba(248, 219, 149, 0.24));
+  filter:
+    drop-shadow(0 0 3px rgba(255, 247, 225, 0.8))
+    drop-shadow(0 0 10px rgba(240, 194, 81, 0.65))
+    drop-shadow(0 0 18px rgba(181, 116, 18, 0.3));
   transition: opacity 240ms ease;
 }
 
 .dynamic-button-stroke-full {
   opacity: 0;
+  filter:
+    drop-shadow(0 0 2px rgba(255, 247, 228, 0.7))
+    drop-shadow(0 0 10px rgba(222, 176, 67, 0.28))
+    drop-shadow(0 0 16px rgba(181, 116, 18, 0.18));
   transition: opacity 280ms ease;
 }
 
@@ -3829,6 +3980,15 @@ html[lang="ka"] .brandbook-list dt {
   --dynamic-button-surface: linear-gradient(90deg, rgba(244, 227, 196, 0.97) 0%, rgba(221, 193, 151, 0.97) 30%, rgba(110, 157, 220, 0.97) 64%, rgba(43, 96, 176, 0.98) 100%);
   --dynamic-button-shadow-rgb: 14, 43, 96;
   --dynamic-button-label-color: #17335f;
+}
+
+.promo-popup-button-secondary.dynamic-button {
+  --dynamic-button-border: rgba(214, 199, 255, 0.24);
+  --dynamic-button-surface:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 68%),
+    rgba(255, 255, 255, 0.08);
+  --dynamic-button-shadow-rgb: 45, 28, 90;
+  --dynamic-button-label-color: var(--text);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -182,6 +182,9 @@ const escapeHtml = (value) =>
     return map[char];
   });
 
+const escapeHtmlWithLineBreaks = (value) =>
+  escapeHtml(value).replace(/\r?\n/g, "<br>");
+
 const isDialogBackdropClick = (dialog, event) => {
   const rect = dialog.getBoundingClientRect();
 
@@ -282,7 +285,7 @@ if (promoPopupConfig?.enabled) {
           <span class="promo-popup-eyebrow">${escapeHtml(content.eyebrow || "")}</span>
           <h2 class="promo-popup-title" id="promo-popup-title">
             <span class="promo-popup-title-top">${escapeHtml(content.titleTop || "")}</span>
-            <span class="promo-popup-title-main">${escapeHtml(content.titleMain || "")}</span>
+            <span class="promo-popup-title-main">${escapeHtmlWithLineBreaks(content.titleMain || "")}</span>
           </h2>
           <p class="promo-popup-description" id="promo-popup-description">${escapeHtml(content.description || "")}</p>
           ${pointsMarkup}
@@ -867,7 +870,7 @@ if (contactForm) {
 
 // --- Dynamic CTA Hover Tracking ---
 (function initDynamicButtons() {
-  const dynamicButtons = Array.from(document.querySelectorAll(".button-primary, .promo-popup-button-primary"));
+  const dynamicButtons = Array.from(document.querySelectorAll(".button-primary, .promo-popup-button-primary, .promo-popup-button-secondary"));
   if (!dynamicButtons.length) return;
 
   const finePointerQuery = window.matchMedia("(pointer: fine)");
@@ -887,12 +890,6 @@ if (contactForm) {
   const createStrokeRect = (className, strokeWidth, strokeValue) => {
     const rect = document.createElementNS(svgNamespace, "rect");
     rect.setAttribute("class", className);
-    rect.setAttribute("x", "1.7");
-    rect.setAttribute("y", "1.7");
-    rect.setAttribute("width", "96.6");
-    rect.setAttribute("height", "96.6");
-    rect.setAttribute("rx", "48.3");
-    rect.setAttribute("ry", "48.3");
     rect.setAttribute("pathLength", "100");
     rect.setAttribute("fill", "none");
     rect.setAttribute("stroke-width", strokeWidth);
@@ -944,6 +941,7 @@ if (contactForm) {
     let trimEcho;
     let trimResolve;
     let trimFull;
+    let trimTrack;
 
     if (!trimStroke) {
       const trimGradientId = `dynamic-button-trim-${buttonIndex + 1}`;
@@ -962,22 +960,23 @@ if (contactForm) {
       trimGradient.setAttribute("x2", "100%");
       trimGradient.setAttribute("y2", "0%");
       trimGradient.append(
-        createGradientStop("0%", "#c58b2c", "0.95"),
-        createGradientStop("22%", "#efd39a", "1"),
-        createGradientStop("52%", "#fff9ea", "1"),
-        createGradientStop("78%", "#e1b458", "0.96"),
-        createGradientStop("100%", "#b97a1e", "0.92")
+        createGradientStop("0%", "#8d5a12", "0.98"),
+        createGradientStop("18%", "#d7a13d", "1"),
+        createGradientStop("46%", "#fff5db", "1"),
+        createGradientStop("74%", "#f0c766", "0.98"),
+        createGradientStop("100%", "#a96a16", "0.94")
       );
 
       defs.appendChild(trimGradient);
       trimStroke.appendChild(defs);
 
-      trimEcho = createStrokeRect("dynamic-button-stroke-echo", "2.5", `url(#${trimGradientId})`);
-      trimResolve = createStrokeRect("dynamic-button-stroke-resolve", "1.45", `url(#${trimGradientId})`);
+      trimTrack = createStrokeRect("dynamic-button-stroke-track", "0.9");
+      trimEcho = createStrokeRect("dynamic-button-stroke-echo", "3.15", `url(#${trimGradientId})`);
+      trimResolve = createStrokeRect("dynamic-button-stroke-resolve", "1.7", `url(#${trimGradientId})`);
       trimFull = createStrokeRect("dynamic-button-stroke-full", "1.05", `url(#${trimGradientId})`);
 
       trimStroke.append(
-        createStrokeRect("dynamic-button-stroke-track", "0.9"),
+        trimTrack,
         trimEcho,
         trimResolve,
         trimFull
@@ -985,6 +984,7 @@ if (contactForm) {
 
       btn.insertBefore(trimStroke, btn.firstChild);
     } else {
+      trimTrack = trimStroke.querySelector(".dynamic-button-stroke-track");
       trimEcho = trimStroke.querySelector(".dynamic-button-stroke-echo");
       trimResolve = trimStroke.querySelector(".dynamic-button-stroke-resolve");
       trimFull = trimStroke.querySelector(".dynamic-button-stroke-full");
@@ -1002,20 +1002,50 @@ if (contactForm) {
     const targetState = { ...currentState };
     let rafId = 0;
 
+    const layoutTrimStroke = () => {
+      const rect = btn.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const styles = window.getComputedStyle(btn);
+      const outset = Number.parseFloat(styles.getPropertyValue("--dynamic-stroke-outset")) || 0;
+      const width = rect.width;
+      const height = rect.height;
+      const outerWidth = width + (outset * 2);
+      const outerHeight = height + (outset * 2);
+      const strokeRects = [trimTrack, trimEcho, trimResolve, trimFull].filter(Boolean);
+
+      trimStroke.setAttribute("viewBox", `0 0 ${outerWidth.toFixed(2)} ${outerHeight.toFixed(2)}`);
+
+      strokeRects.forEach((strokeRect) => {
+        const strokeWidth = Number.parseFloat(strokeRect.getAttribute("stroke-width")) || 0;
+        const inset = strokeWidth / 2;
+        const strokeWidthValue = Math.max(0.01, outerWidth - strokeWidth);
+        const strokeHeightValue = Math.max(0.01, outerHeight - strokeWidth);
+        const radius = Math.max(0.01, strokeHeightValue / 2);
+
+        strokeRect.setAttribute("x", inset.toFixed(2));
+        strokeRect.setAttribute("y", inset.toFixed(2));
+        strokeRect.setAttribute("width", strokeWidthValue.toFixed(2));
+        strokeRect.setAttribute("height", strokeHeightValue.toFixed(2));
+        strokeRect.setAttribute("rx", radius.toFixed(2));
+        strokeRect.setAttribute("ry", radius.toFixed(2));
+      });
+    };
+
     const applyTrimStroke = () => {
       const progress = currentState.progress;
       const trimStart = 100 - currentState.trimStart;
-      const echoLength = 12 + (progress * 56);
-      const resolveLength = 10 + (progress * 108);
-      const fullOpacity = Math.pow(progress, 1.7) * 0.88;
+      const echoLength = 7 + (progress * 30);
+      const resolveLength = 12 + (progress * 110);
+      const fullOpacity = Math.pow(progress, 1.8) * 0.78;
 
       trimEcho.style.strokeDasharray = `${echoLength.toFixed(2)} 140`;
-      trimEcho.style.strokeDashoffset = `${(trimStart - (progress * 8)).toFixed(2)}`;
-      trimEcho.style.opacity = `${(progress * 0.55).toFixed(3)}`;
+      trimEcho.style.strokeDashoffset = `${(trimStart - (progress * 14)).toFixed(2)}`;
+      trimEcho.style.opacity = `${Math.min(0.94, Math.pow(progress, 1.06) * 0.94).toFixed(3)}`;
 
       trimResolve.style.strokeDasharray = `${resolveLength.toFixed(2)} 140`;
       trimResolve.style.strokeDashoffset = `${trimStart.toFixed(2)}`;
-      trimResolve.style.opacity = `${Math.min(0.96, progress * 0.96).toFixed(3)}`;
+      trimResolve.style.opacity = `${Math.min(0.98, Math.pow(progress, 0.92) * 0.9).toFixed(3)}`;
 
       trimFull.style.opacity = `${fullOpacity.toFixed(3)}`;
     };
@@ -1032,13 +1062,18 @@ if (contactForm) {
     };
 
     const tick = () => {
-      currentState.progress += (targetState.progress - currentState.progress) * 0.15;
-      currentState.x += (targetState.x - currentState.x) * 0.18;
-      currentState.y += (targetState.y - currentState.y) * 0.18;
-      currentState.tiltX += (targetState.tiltX - currentState.tiltX) * 0.14;
-      currentState.tiltY += (targetState.tiltY - currentState.tiltY) * 0.14;
-      currentState.sheenShift += (targetState.sheenShift - currentState.sheenShift) * 0.15;
-      currentState.trimStart += (targetState.trimStart - currentState.trimStart) * 0.16;
+      const progressEase = targetState.progress < currentState.progress ? 0.04 : 0.17;
+      const pointerEase = targetState.progress < currentState.progress ? 0.07 : 0.18;
+      const tiltEase = targetState.progress < currentState.progress ? 0.06 : 0.14;
+      const sheenEase = targetState.progress < currentState.progress ? 0.06 : 0.15;
+
+      currentState.progress += (targetState.progress - currentState.progress) * progressEase;
+      currentState.x += (targetState.x - currentState.x) * pointerEase;
+      currentState.y += (targetState.y - currentState.y) * pointerEase;
+      currentState.tiltX += (targetState.tiltX - currentState.tiltX) * tiltEase;
+      currentState.tiltY += (targetState.tiltY - currentState.tiltY) * tiltEase;
+      currentState.sheenShift += (targetState.sheenShift - currentState.sheenShift) * sheenEase;
+      currentState.trimStart += (targetState.trimStart - currentState.trimStart) * 0.12;
 
       const isSettled =
         Math.abs(targetState.progress - currentState.progress) < 0.001 &&
@@ -1076,19 +1111,17 @@ if (contactForm) {
       const py = localY / rect.height;
       const nx = (px * 2) - 1;
       const ny = (py * 2) - 1;
-      const distance = Math.min(Math.hypot(nx, ny), 1.28);
-      const energy = clamp(1 - (distance * 0.54), 0.34, 1);
       const nextTrimStart = resolveTrimStart(localX, localY, rect.width, rect.height);
 
-      targetState.progress = clamp((0.44 + (energy * 0.56)) * strength, 0, 1);
+      targetState.progress = clamp(strength, 0, 1);
       targetState.x = clamp(px * 100, 10, 90);
       targetState.y = clamp(py * 100, 18, 82);
       targetState.tiltX = clamp(ny * -3.9 * strength, -3.9, 3.9);
       targetState.tiltY = clamp(nx * 5.8 * strength, -5.8, 5.8);
       targetState.sheenShift = clamp(-24 + (px * 60), -24, 36);
-      targetState.trimStart = isEntry
-        ? nextTrimStart
-        : ((targetState.trimStart * 0.84) + (nextTrimStart * 0.16));
+      if (isEntry) {
+        targetState.trimStart = nextTrimStart;
+      }
 
       ensureTick();
     };
@@ -1121,7 +1154,7 @@ if (contactForm) {
     }
 
     btn.addEventListener("focus", () => {
-      activateCentered(0.95);
+      activateCentered(1);
     });
 
     btn.addEventListener("blur", resetTarget);
@@ -1136,6 +1169,8 @@ if (contactForm) {
     reducedMotionQuery.addEventListener?.("change", handleCapabilityChange);
 
     applyState();
+    layoutTrimStroke();
+    window.addEventListener("resize", layoutTrimStroke);
   });
 })();
 
@@ -1157,6 +1192,12 @@ if (contactForm) {
     x: 50,
     y: 34,
     strength: 0,
+    depth: 0,
+    surge: 0,
+    tiltX: 0,
+    tiltY: 0,
+    stretchX: 1,
+    stretchY: 1,
     driftX: 0,
     driftY: 0
   };
@@ -1168,21 +1209,39 @@ if (contactForm) {
     heroSection.style.setProperty("--hero-bulge-x", `${currentState.x.toFixed(2)}%`);
     heroSection.style.setProperty("--hero-bulge-y", `${currentState.y.toFixed(2)}%`);
     heroSection.style.setProperty("--hero-bulge-strength", currentState.strength.toFixed(4));
+    heroSection.style.setProperty("--hero-bulge-depth", currentState.depth.toFixed(4));
+    heroSection.style.setProperty("--hero-bulge-surge", currentState.surge.toFixed(4));
+    heroSection.style.setProperty("--hero-bulge-tilt-x", `${currentState.tiltX.toFixed(2)}deg`);
+    heroSection.style.setProperty("--hero-bulge-tilt-y", `${currentState.tiltY.toFixed(2)}deg`);
+    heroSection.style.setProperty("--hero-bulge-stretch-x", currentState.stretchX.toFixed(4));
+    heroSection.style.setProperty("--hero-bulge-stretch-y", currentState.stretchY.toFixed(4));
     heroSection.style.setProperty("--hero-bulge-drift-x", `${currentState.driftX.toFixed(2)}px`);
     heroSection.style.setProperty("--hero-bulge-drift-y", `${currentState.driftY.toFixed(2)}px`);
   };
 
   const tick = () => {
-    currentState.x += (targetState.x - currentState.x) * 0.08;
-    currentState.y += (targetState.y - currentState.y) * 0.08;
-    currentState.strength += (targetState.strength - currentState.strength) * 0.09;
-    currentState.driftX += (targetState.driftX - currentState.driftX) * 0.1;
-    currentState.driftY += (targetState.driftY - currentState.driftY) * 0.1;
+    currentState.x += (targetState.x - currentState.x) * 0.1;
+    currentState.y += (targetState.y - currentState.y) * 0.1;
+    currentState.strength += (targetState.strength - currentState.strength) * 0.12;
+    currentState.depth += (targetState.depth - currentState.depth) * 0.13;
+    currentState.surge += (targetState.surge - currentState.surge) * 0.14;
+    currentState.tiltX += (targetState.tiltX - currentState.tiltX) * 0.12;
+    currentState.tiltY += (targetState.tiltY - currentState.tiltY) * 0.12;
+    currentState.stretchX += (targetState.stretchX - currentState.stretchX) * 0.12;
+    currentState.stretchY += (targetState.stretchY - currentState.stretchY) * 0.12;
+    currentState.driftX += (targetState.driftX - currentState.driftX) * 0.12;
+    currentState.driftY += (targetState.driftY - currentState.driftY) * 0.12;
 
     const isSettled =
       Math.abs(targetState.x - currentState.x) < 0.01 &&
       Math.abs(targetState.y - currentState.y) < 0.01 &&
       Math.abs(targetState.strength - currentState.strength) < 0.001 &&
+      Math.abs(targetState.depth - currentState.depth) < 0.001 &&
+      Math.abs(targetState.surge - currentState.surge) < 0.001 &&
+      Math.abs(targetState.tiltX - currentState.tiltX) < 0.01 &&
+      Math.abs(targetState.tiltY - currentState.tiltY) < 0.01 &&
+      Math.abs(targetState.stretchX - currentState.stretchX) < 0.001 &&
+      Math.abs(targetState.stretchY - currentState.stretchY) < 0.001 &&
       Math.abs(targetState.driftX - currentState.driftX) < 0.01 &&
       Math.abs(targetState.driftY - currentState.driftY) < 0.01;
 
@@ -1205,6 +1264,12 @@ if (contactForm) {
 
   const releaseBulge = () => {
     targetState.strength = 0;
+    targetState.depth = 0;
+    targetState.surge = 0;
+    targetState.tiltX = 0;
+    targetState.tiltY = 0;
+    targetState.stretchX = 1;
+    targetState.stretchY = 1;
     targetState.driftX = 0;
     targetState.driftY = 0;
     ensureTick();
@@ -1215,6 +1280,7 @@ if (contactForm) {
     releaseTimer = window.setTimeout(releaseBulge, 3000);
   };
 
+  let lastPointer = null;
   const setTargetFromPoint = (clientX, clientY) => {
     const rect = heroSection.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
@@ -1224,13 +1290,31 @@ if (contactForm) {
     const nx = (px * 2) - 1;
     const ny = (py * 2) - 1;
     const distance = Math.min(Math.hypot(nx, ny), 1.25);
-    const energy = clamp(1.04 - (distance * 0.5), 0.38, 1);
+    const energy = clamp(1.18 - (distance * 0.68), 0.26, 1);
+    const centerBias = Math.pow(energy, 1.1);
+    const now = performance.now();
+    let motionBoost = 0;
+
+    if (lastPointer) {
+      const delta = Math.hypot(px - lastPointer.x, py - lastPointer.y);
+      const elapsed = Math.max(now - lastPointer.time, 16);
+      motionBoost = clamp((delta / elapsed) * 260, 0, 0.34);
+    }
+
+    lastPointer = { x: px, y: py, time: now };
+    const lift = centerBias + motionBoost;
 
     targetState.x = clamp(px * 100, 8, 92);
     targetState.y = clamp(py * 100, 10, 90);
-    targetState.strength = energy;
-    targetState.driftX = nx * (8 + (energy * 16));
-    targetState.driftY = ny * (7 + (energy * 14));
+    targetState.strength = clamp(energy + (motionBoost * 0.22), 0, 1);
+    targetState.depth = 0.32 + (centerBias * 1.48) + (motionBoost * 0.7);
+    targetState.surge = 0.08 + (centerBias * 0.24) + motionBoost;
+    targetState.tiltX = ny * -8.8 * lift;
+    targetState.tiltY = nx * 10.8 * lift;
+    targetState.stretchX = 1 + (centerBias * 0.12);
+    targetState.stretchY = 1 + (centerBias * 0.12);
+    targetState.driftX = nx * (22 + (lift * 38));
+    targetState.driftY = ny * (18 + (lift * 34));
 
     scheduleRelease();
     ensureTick();
@@ -1239,8 +1323,15 @@ if (contactForm) {
   const resetImmediately = () => {
     window.clearTimeout(releaseTimer);
     targetState.strength = 0;
+    targetState.depth = 0;
+    targetState.surge = 0;
+    targetState.tiltX = 0;
+    targetState.tiltY = 0;
+    targetState.stretchX = 1;
+    targetState.stretchY = 1;
     targetState.driftX = 0;
     targetState.driftY = 0;
+    lastPointer = null;
     ensureTick();
   };
 
@@ -1252,7 +1343,10 @@ if (contactForm) {
     setTargetFromPoint(event.clientX, event.clientY);
   });
 
-  heroSection.addEventListener("pointerleave", scheduleRelease);
+  heroSection.addEventListener("pointerleave", () => {
+    lastPointer = null;
+    scheduleRelease();
+  });
   window.addEventListener("blur", resetImmediately);
 
   const handleCapabilityChange = () => {

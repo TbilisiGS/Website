@@ -13,7 +13,7 @@ window.TGSiteConfig = {
       en: {
         eyebrow: "Limited-Time Website Offer",
         titleTop: "Hot Sale Offer",
-        titleMain: "Let us create your unique website",
+        titleMain: "Let us create\nyour unique website",
         description:
           "Premium, tailored web design for local businesses that need a sharper first impression, stronger trust, and faster inquiry flow.",
         points: [
@@ -36,7 +36,7 @@ window.TGSiteConfig = {
       ka: {
         eyebrow: "ვებსაიტის სპეციალური შეთავაზება",
         titleTop: "ცხელი შეთავაზება",
-        titleMain: "შევქმნათ თქვენი უნიკალური ვებსაიტი",
+        titleMain: "შევქმნათ თქვენი\nუნიკალური ვებსაიტი",
         description:
           "პრემიუმ, ბიზნესზე მორგებული ვებსაიტი ძლიერი პირველი შთაბეჭდილებისთვის, მეტი ნდობისთვის და უფრო მარტივი მოთხოვნების მისაღებად.",
         points: [
