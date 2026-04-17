@@ -642,20 +642,20 @@ if (contactForms.length) {
       trimGradient.setAttribute("x2", "100%");
       trimGradient.setAttribute("y2", "0%");
       trimGradient.append(
-        createGradientStop("0%", "#8d5a12", "0.98"),
-        createGradientStop("18%", "#d7a13d", "1"),
-        createGradientStop("46%", "#fff5db", "1"),
-        createGradientStop("74%", "#f0c766", "0.98"),
-        createGradientStop("100%", "#a96a16", "0.94")
+        createGradientStop("0%", "#a86d1f", "0.78"),
+        createGradientStop("20%", "#e0b96a", "0.96"),
+        createGradientStop("48%", "#fff7e7", "1"),
+        createGradientStop("76%", "#f0d39d", "0.9"),
+        createGradientStop("100%", "#bc8430", "0.72")
       );
 
       defs.appendChild(trimGradient);
       trimStroke.appendChild(defs);
 
-      trimTrack = createStrokeRect("dynamic-button-stroke-track", "0.9");
-      trimEcho = createStrokeRect("dynamic-button-stroke-echo", "3.15", `url(#${trimGradientId})`);
-      trimResolve = createStrokeRect("dynamic-button-stroke-resolve", "1.7", `url(#${trimGradientId})`);
-      trimFull = createStrokeRect("dynamic-button-stroke-full", "1.05", `url(#${trimGradientId})`);
+      trimTrack = createStrokeRect("dynamic-button-stroke-track", "0.7");
+      trimEcho = createStrokeRect("dynamic-button-stroke-echo", "2.25", `url(#${trimGradientId})`);
+      trimResolve = createStrokeRect("dynamic-button-stroke-resolve", "1.3", `url(#${trimGradientId})`);
+      trimFull = createStrokeRect("dynamic-button-stroke-full", "0.92", `url(#${trimGradientId})`);
 
       trimStroke.append(
         trimTrack,
@@ -717,17 +717,17 @@ if (contactForms.length) {
     const applyTrimStroke = () => {
       const progress = currentState.progress;
       const trimStart = 100 - currentState.trimStart;
-      const echoLength = 7 + (progress * 30);
-      const resolveLength = 12 + (progress * 110);
-      const fullOpacity = Math.pow(progress, 1.8) * 0.78;
+      const echoLength = 5 + (progress * 22);
+      const resolveLength = 10 + (progress * 86);
+      const fullOpacity = Math.pow(progress, 1.92) * 0.56;
 
       trimEcho.style.strokeDasharray = `${echoLength.toFixed(2)} 140`;
-      trimEcho.style.strokeDashoffset = `${(trimStart - (progress * 14)).toFixed(2)}`;
-      trimEcho.style.opacity = `${Math.min(0.94, Math.pow(progress, 1.06) * 0.94).toFixed(3)}`;
+      trimEcho.style.strokeDashoffset = `${(trimStart - (progress * 9)).toFixed(2)}`;
+      trimEcho.style.opacity = `${Math.min(0.72, Math.pow(progress, 1.12) * 0.72).toFixed(3)}`;
 
       trimResolve.style.strokeDasharray = `${resolveLength.toFixed(2)} 140`;
       trimResolve.style.strokeDashoffset = `${trimStart.toFixed(2)}`;
-      trimResolve.style.opacity = `${Math.min(0.98, Math.pow(progress, 0.92) * 0.9).toFixed(3)}`;
+      trimResolve.style.opacity = `${Math.min(0.84, Math.pow(progress, 0.96) * 0.82).toFixed(3)}`;
 
       trimFull.style.opacity = `${fullOpacity.toFixed(3)}`;
     };

@@ -3938,7 +3938,7 @@ html[lang="ka"] .brandbook-list dt {
   --tilt-y: 0deg;
   --sheen-shift: -18%;
   --trim-start: 12px;
-  --dynamic-stroke-outset: 7px;
+  --dynamic-stroke-outset: 5px;
   --dynamic-button-border: rgba(255, 255, 255, 0.2);
   --dynamic-button-surface: linear-gradient(135deg, rgb(26, 115, 232) 0%, rgb(32, 137, 221) 46%, rgb(24, 128, 56) 100%);
   --dynamic-button-shadow-rgb: 16, 78, 160;
@@ -4036,9 +4036,9 @@ html[lang="ka"] .brandbook-list dt {
   pointer-events: none;
   overflow: visible;
   filter:
-    drop-shadow(0 0 1px rgba(255, 247, 229, 0.96))
-    drop-shadow(0 0 10px rgba(233, 187, 82, 0.42))
-    drop-shadow(0 0 18px rgba(197, 127, 19, 0.18));
+    drop-shadow(0 0 1px rgba(255, 248, 236, 0.9))
+    drop-shadow(0 0 6px rgba(232, 195, 116, 0.24))
+    drop-shadow(0 0 12px rgba(176, 122, 33, 0.1));
 }
 
 .dynamic-button-stroke-track,
@@ -4050,35 +4050,35 @@ html[lang="ka"] .brandbook-list dt {
 }
 
 .dynamic-button-stroke-track {
-  stroke: rgba(255, 234, 191, 0.14);
-  opacity: calc(0.16 + (var(--hover-progress) * 0.22));
+  stroke: rgba(255, 236, 201, 0.12);
+  opacity: calc(0.1 + (var(--hover-progress) * 0.16));
   transition: opacity 280ms ease;
 }
 
 .dynamic-button-stroke-echo {
   opacity: 0;
   filter:
-    drop-shadow(0 0 4px rgba(255, 250, 239, 0.94))
-    drop-shadow(0 0 12px rgba(255, 219, 129, 0.92))
-    drop-shadow(0 0 24px rgba(214, 146, 34, 0.5));
+    drop-shadow(0 0 2px rgba(255, 249, 238, 0.8))
+    drop-shadow(0 0 8px rgba(245, 215, 151, 0.34))
+    drop-shadow(0 0 14px rgba(198, 142, 49, 0.16));
   transition: opacity 240ms ease;
 }
 
 .dynamic-button-stroke-resolve {
   opacity: 0;
   filter:
-    drop-shadow(0 0 3px rgba(255, 247, 225, 0.8))
-    drop-shadow(0 0 10px rgba(240, 194, 81, 0.65))
-    drop-shadow(0 0 18px rgba(181, 116, 18, 0.3));
+    drop-shadow(0 0 2px rgba(255, 248, 230, 0.72))
+    drop-shadow(0 0 7px rgba(240, 200, 104, 0.28))
+    drop-shadow(0 0 12px rgba(181, 122, 29, 0.12));
   transition: opacity 240ms ease;
 }
 
 .dynamic-button-stroke-full {
   opacity: 0;
   filter:
-    drop-shadow(0 0 2px rgba(255, 247, 228, 0.7))
-    drop-shadow(0 0 10px rgba(222, 176, 67, 0.28))
-    drop-shadow(0 0 16px rgba(181, 116, 18, 0.18));
+    drop-shadow(0 0 1px rgba(255, 247, 230, 0.66))
+    drop-shadow(0 0 5px rgba(232, 192, 98, 0.18))
+    drop-shadow(0 0 10px rgba(181, 122, 29, 0.08));
   transition: opacity 280ms ease;
 }
 
