@@ -3538,7 +3538,20 @@ html[lang="ka"] .brandbook-list dt {
   .contact-layout,
   .about-layout,
   .footer-shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    justify-items: center;
+  }
+
+  .hero-copy,
+  .hero-visual,
+  .panel,
+  .contact-form,
+  .contact-aside,
+  .about-visual,
+  .cta-content > div,
+  .footer-shell > div {
+    width: min(100%, 42rem);
+    margin-inline: auto;
   }
 
   .stats-row,
@@ -3563,6 +3576,32 @@ html[lang="ka"] .brandbook-list dt {
 
   .promo-popup-title {
     max-width: 100%;
+  }
+
+  .button-group,
+  .pill-row,
+  .filter-bar,
+  .project-meta,
+  .project-actions,
+  .pricing-notes-list {
+    justify-content: center;
+  }
+
+  .filter-summary,
+  .footer-shell,
+  .footer-bottom {
+    text-align: center;
+  }
+
+  .filter-summary,
+  .footer-shell > div,
+  .footer-nav,
+  .footer-contact {
+    justify-items: center;
+  }
+
+  .filter-count {
+    align-self: center;
   }
 
   .bubble-points-shell {
@@ -3603,6 +3642,14 @@ html[lang="ka"] .brandbook-list dt {
   }
 
 @media (max-width: 900px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: min(calc(100% - 1.5rem), 46rem);
+  }
+
   .nav-toggle {
     display: inline-flex;
   }
@@ -3650,11 +3697,21 @@ html[lang="ka"] .brandbook-list dt {
     margin-left: auto;
   }
 
+  .hero-visual,
+  .panel,
+  .contact-form,
+  .contact-aside,
+  .about-visual,
+  .pricing-notes {
+    width: 100%;
+  }
+
   .hero-visual {
     min-height: auto;
   }
 
   .visual-canvas {
+    width: min(100%, 30rem);
     height: 360px;
   }
 
@@ -3688,7 +3745,7 @@ html[lang="ka"] .brandbook-list dt {
   }
 
   .container {
-    width: min(calc(100% - 1.2rem), var(--container));
+    width: min(calc(100% - 1.1rem), 34rem);
   }
 
   .section,
@@ -3743,13 +3800,36 @@ html[lang="ka"] .brandbook-list dt {
     height: 320px;
   }
 
+  .hero-grid {
+    gap: 1.4rem;
+  }
+
+  .page-hero .hero-title {
+    max-width: 11.5ch;
+    font-size: clamp(2rem, 10vw, 2.8rem) !important;
+  }
+
+  .page-hero .hero-lead {
+    max-width: 24ch !important;
+    font-size: clamp(1.05rem, 5.3vw, 1.4rem) !important;
+  }
+
+  .page-hero .hero-copy > .hero-lead,
+  .page-hero .hero-copy > .lead,
+  .page-hero .hero-copy > .proof-note {
+    margin-inline: auto;
+  }
+
   .visual-canvas-photo {
     height: auto;
   }
 
   .hero-photo-frame {
+    width: min(100%, 24rem);
+    margin-inline: auto;
     border-radius: 24px;
     padding: 0.7rem;
+    transform: none;
   }
 
   .hero-visual-image {
@@ -3782,11 +3862,13 @@ html[lang="ka"] .brandbook-list dt {
   .form-grid,
   .band-grid,
   .service-shortcuts {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .filter-summary {
     gap: 0.6rem;
+    justify-items: center;
+    text-align: center;
   }
 
   .success-banner .success-actions {
@@ -3799,6 +3881,8 @@ html[lang="ka"] .brandbook-list dt {
 
   .footer-bottom {
     flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .floating-contact {
@@ -3899,6 +3983,59 @@ html[lang="ka"] .brandbook-list dt {
 
   .bubble-center p {
     font-size: clamp(1.28rem, 5.5vw, 1.72rem);
+  }
+
+  .hero-copy,
+  .section-heading,
+  .pricing-heading,
+  .bubble-points-heading {
+    width: min(100%, 32rem);
+    margin-inline: auto;
+  }
+
+  .hero-copy,
+  .hero-visual,
+  .panel,
+  .contact-form,
+  .contact-aside,
+  .about-visual,
+  .cta-content > div,
+  .footer-shell > div {
+    width: 100%;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .button-group .button {
+    width: min(100%, 22rem);
+    justify-content: center;
+  }
+
+  .contact-form {
+    padding: 1.15rem !important;
+  }
+
+  .timeline-item {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .timeline-item strong {
+    min-width: 0;
+  }
+
+  .footer-shell {
+    gap: 1rem !important;
+  }
+
+  .site-footer .brand,
+  .footer-nav,
+  .footer-contact {
+    justify-content: center;
+    justify-items: center;
   }
 }
 
@@ -4399,30 +4536,34 @@ html[lang="ka"] .brandbook-list dt {
 
 @media (max-width: 768px) {
   .tree-trunk {
-    left: 20px;
+    display: none;
   }
 
   .js .tree-container .tree-trunk {
-    transform: translateX(-50%) scaleY(0);
+    transform: none;
   }
 
   .tree-node {
     width: 100%;
     left: 0;
-    justify-content: flex-start;
-    padding-left: 50px;
+    justify-content: center;
+    padding-left: 0;
     padding-right: 0;
   }
-  .left-node .tree-branch, .right-node .tree-branch {
-    left: 20px;
-    width: 30px;
-    transform-origin: left center;
+
+  .left-node .tree-branch,
+  .right-node .tree-branch {
+    display: none;
   }
-  .left-node .tree-branch::after, .right-node .tree-branch::after {
-    left: -8px;
+
+  .left-node .tree-branch::after,
+  .right-node .tree-branch::after {
+    left: auto;
   }
+
   .tree-card {
-    max-width: 100%;
+    max-width: min(100%, 30rem);
+    padding: 1.5rem 1.1rem 1.2rem;
   }
 
   .tree-card-head {
@@ -4434,8 +4575,11 @@ html[lang="ka"] .brandbook-list dt {
     height: 3rem;
   }
 
-  .left-node .tree-card .node-number, .right-node .tree-card .node-number {
-    left: -10px;
+  .left-node .tree-card .node-number,
+  .right-node .tree-card .node-number {
+    left: 50%;
     right: auto;
+    top: -18px;
+    transform: translateX(-50%);
   }
 }
