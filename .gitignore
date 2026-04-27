@@ -1,0 +1,8 @@
+.deploy-clean/
+.deploy-clean-2/
+.netlify/
+.netlify-mcp-tmp/
+.tools/
+.tools-agent/
+_tmp_*
+deploy-*.zip
