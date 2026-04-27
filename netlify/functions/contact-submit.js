@@ -16,6 +16,7 @@ const parseAllowedOrigins = () =>
 const RATE_LIMIT_WINDOW_MINUTES = Math.max(1, Number(process.env.CONTACT_RATE_LIMIT_WINDOW_MINUTES) || 15);
 const RATE_LIMIT_MAX_PER_IP = Math.max(1, Number(process.env.CONTACT_RATE_LIMIT_MAX_PER_IP) || 5);
 const RATE_LIMIT_MAX_PER_CONTACT = Math.max(1, Number(process.env.CONTACT_RATE_LIMIT_MAX_PER_CONTACT) || 3);
+const MAX_REQUEST_BYTES = 12 * 1024;
 
 const buildSecurityHeaders = () => ({
   "X-Content-Type-Options": "nosniff",
@@ -67,17 +68,19 @@ const parseBody = (event) => {
   const contentType = (event.headers["content-type"] || event.headers["Content-Type"] || "").toLowerCase();
 
   if (!rawBody) return {};
+  if (rawBody.length > MAX_REQUEST_BYTES) {
+    const error = new Error("Request body is too large.");
+    error.statusCode = 413;
+    throw error;
+  }
 
   if (contentType.includes("application/json")) {
     return JSON.parse(rawBody);
   }
 
-  if (contentType.includes("application/x-www-form-urlencoded")) {
-    const params = new URLSearchParams(rawBody);
-    return Object.fromEntries(params.entries());
-  }
-
-  return JSON.parse(rawBody);
+  const error = new Error("Content type must be application/json.");
+  error.statusCode = 415;
+  throw error;
 };
 
 const buildSupabaseHeaders = () => ({
@@ -145,7 +148,8 @@ exports.handler = async (event) => {
     const message = sanitizeText(payload.message, 4000);
     const honeypot = sanitizeText(payload.website, 200);
     const page = sanitizeText(payload.page, 120);
-    const language = sanitizeText(payload.language, 20) || "en";
+    const rawLanguage = sanitizeText(payload.language, 20).toLowerCase();
+    const language = rawLanguage === "ka" ? "ka" : "en";
 
     if (honeypot) {
       return jsonResponse(200, { ok: true }, origin, allowedOrigins);
@@ -218,6 +222,14 @@ exports.handler = async (event) => {
     return jsonResponse(200, { ok: true }, origin, allowedOrigins);
   } catch (error) {
     console.error("Contact submission failed:", error);
+    if (error instanceof SyntaxError) {
+      return jsonResponse(400, { ok: false, error: "Request body is invalid." }, origin, allowedOrigins);
+    }
+
+    if (error.statusCode === 413 || error.statusCode === 415) {
+      return jsonResponse(error.statusCode, { ok: false, error: error.message }, origin, allowedOrigins);
+    }
+
     return jsonResponse(500, { ok: false, error: "Unexpected server error." }, origin, allowedOrigins);
   }
 };

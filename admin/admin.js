@@ -254,7 +254,7 @@
     if (!allowed) {
       await supabaseClient.auth.signOut();
       setView("auth");
-      setStatus("This email is authenticated, but it is not listed in crm_admins.", "error");
+      setStatus("Access denied.", "error");
       return;
     }
 
@@ -316,7 +316,7 @@
       await syncFromSession();
     } catch (error) {
       console.error(error);
-      setStatus(error.message || "Sign-in failed.", "error");
+      setStatus("Sign-in failed. Check your email and password.", "error");
     } finally {
       setButtonBusy(elements.loginButton, false, "Signing in...");
     }
