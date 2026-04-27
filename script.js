@@ -376,6 +376,44 @@ if (contactForms.length) {
     }
   };
   const copy = uiCopy[currentLang] || uiCopy.en;
+  const setButtonLabel = (label) => {
+    if (!submitButton) return;
+
+    const labelNode = submitButton.querySelector(".dynamic-button-label");
+
+    if (labelNode) {
+      labelNode.textContent = label;
+      return;
+    }
+
+    submitButton.textContent = label;
+  };
+  const showBanner = (tone, title, message, extraMarkup = "") => {
+    if (!successBanner) return;
+
+    successBanner.classList.add("is-visible");
+    successBanner.classList.toggle("is-error", tone === "error");
+    successBanner.innerHTML = `
+      <strong>${escapeHtml(title)}</strong>
+      <p>${escapeHtml(message)}</p>
+      ${extraMarkup}
+    `;
+  };
+  const setSubmittingState = (isSubmitting) => {
+    if (!submitButton) return;
+
+    if (!submitButton.dataset.defaultLabel) {
+      submitButton.dataset.defaultLabel = submitButton.textContent.trim();
+    }
+
+    submitButton.disabled = isSubmitting;
+    setButtonLabel(isSubmitting ? copy.submitting : submitButton.dataset.defaultLabel);
+
+    if (isSubmitting && successBanner) {
+      successBanner.classList.remove("is-visible", "is-error");
+      successBanner.innerHTML = "";
+    }
+  };
 
   const buildFallbackLinks = ({ name, business, contact, service, message }) => {
     const safeName = name || "there";
