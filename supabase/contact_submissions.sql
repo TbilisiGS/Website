@@ -32,12 +32,71 @@ begin
 end
 $$;
 
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'contact_submissions_name_length_check'
+  ) then
+    alter table public.contact_submissions
+      add constraint contact_submissions_name_length_check
+      check (char_length(name) between 2 and 160);
+  end if;
+
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'contact_submissions_business_length_check'
+  ) then
+    alter table public.contact_submissions
+      add constraint contact_submissions_business_length_check
+      check (char_length(business) between 2 and 160);
+  end if;
+
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'contact_submissions_contact_length_check'
+  ) then
+    alter table public.contact_submissions
+      add constraint contact_submissions_contact_length_check
+      check (char_length(contact) between 5 and 160);
+  end if;
+
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'contact_submissions_message_length_check'
+  ) then
+    alter table public.contact_submissions
+      add constraint contact_submissions_message_length_check
+      check (char_length(message) between 5 and 4000);
+  end if;
+
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'contact_submissions_page_language_check'
+  ) then
+    alter table public.contact_submissions
+      add constraint contact_submissions_page_language_check
+      check (page_language is null or page_language in ('en', 'ka'));
+  end if;
+end
+$$;
+
 create index if not exists contact_submissions_submitted_at_idx
   on public.contact_submissions (submitted_at desc);
 create index if not exists contact_submissions_status_idx
   on public.contact_submissions (status);
 create index if not exists contact_submissions_follow_up_at_idx
   on public.contact_submissions (follow_up_at);
+create index if not exists contact_submissions_ip_hash_submitted_at_idx
+  on public.contact_submissions (ip_hash, submitted_at desc)
+  where ip_hash is not null;
+create index if not exists contact_submissions_contact_submitted_at_idx
+  on public.contact_submissions (contact, submitted_at desc);
 
 create table if not exists public.crm_admins (
   email text primary key,
@@ -46,13 +105,17 @@ create table if not exists public.crm_admins (
 
 alter table public.contact_submissions enable row level security;
 alter table public.crm_admins enable row level security;
+alter table public.contact_submissions force row level security;
+alter table public.crm_admins force row level security;
 
 revoke all on public.contact_submissions from anon, authenticated;
 revoke all on public.crm_admins from anon, authenticated;
 
 grant usage on schema public to authenticated;
 grant select on public.crm_admins to authenticated;
-grant select on public.contact_submissions to authenticated;
+grant select (id, name, business, contact, service, message, source_page, page_language, submitted_at, status, notes, follow_up_at)
+  on public.contact_submissions
+  to authenticated;
 grant update (status, notes, follow_up_at) on public.contact_submissions to authenticated;
 
 drop policy if exists "admins can read submissions" on public.contact_submissions;

@@ -204,7 +204,7 @@
   const loadLeads = async () => {
     const { data, error } = await supabaseClient
       .from("contact_submissions")
-      .select("*")
+      .select("id,name,business,contact,service,message,source_page,page_language,submitted_at,status,notes,follow_up_at")
       .order("submitted_at", { ascending: false });
 
     if (error) {
@@ -281,7 +281,7 @@
 
     supabaseClient = window.supabase.createClient(payload.supabaseUrl, payload.supabaseAnonKey, {
       auth: {
-        persistSession: true,
+        persistSession: false,
         autoRefreshToken: true,
         detectSessionInUrl: true
       }
