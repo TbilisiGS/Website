@@ -454,6 +454,10 @@ button {
   background: var(--accent);
 }
 
+.eyebrow-dark {
+  color: var(--text);
+}
+
 h1,
 h2,
 h3,
