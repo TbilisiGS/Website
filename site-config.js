@@ -4,7 +4,7 @@ window.TGSiteConfig = {
   },
   promoPopup: {
     // Bump the version when you want the offer to show again for visitors who previously hid it.
-    enabled: true,
+    enabled: false,
     version: "2026-04-website-offer-v1",
     delayMs: 900,
     hideForDays: 14,

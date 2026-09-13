@@ -235,6 +235,7 @@ document.querySelectorAll("[data-year]").forEach((node) => {
 document.querySelectorAll("[data-nav]").forEach((link) => {
   if (link.dataset.nav === currentPage) {
     link.classList.add("is-active");
+    link.setAttribute("aria-current", "page");
   }
 });
 
@@ -290,7 +291,7 @@ if ("IntersectionObserver" in window && revealNodes.length) {
         }
       });
     },
-    { threshold: 0.18, rootMargin: "0px 0px -30px 0px" }
+    { threshold: 0.01, rootMargin: "0px 0px -30px 0px" }
   );
 
   revealNodes.forEach((node) => revealObserver.observe(node));
@@ -308,15 +309,16 @@ if (filterButtons.length && projectCards.length) {
     const visibleCount = Array.from(projectCards).filter((card) => !card.classList.contains("is-hidden")).length;
     filterCount.textContent =
       currentLang === "ka"
-        ? `${visibleCount} პროექტი ჩანს`
-        : `${visibleCount} project${visibleCount === 1 ? "" : "s"} shown`;
+        ? `${visibleCount} კონცეფცია ჩანს`
+        : `${visibleCount} concept${visibleCount === 1 ? "" : "s"} shown`;
   };
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const filter = button.dataset.filter;
-      filterButtons.forEach((item) => item.classList.remove("is-active"));
+      filterButtons.forEach((item) => { item.classList.remove("is-active"); item.setAttribute("aria-pressed", "false"); });
       button.classList.add("is-active");
+      button.setAttribute("aria-pressed", "true");
 
       projectCards.forEach((card) => {
         const categories = (card.dataset.categories || "").split(" ");
@@ -338,6 +340,40 @@ if (contactForms.length) {
   const successBanner = contactForm.querySelector("[data-form-success]");
   const submitButton = contactForm.querySelector('button[type="submit"]');
   const endpoint = contactForm.getAttribute("action") || "/api/contact";
+  const staticHost = window.location.hostname.endsWith(".github.io") || window.location.protocol === "file:";
+  const selected = new URLSearchParams(window.location.search);
+  if (selected.has("package") || selected.has("concept")) {
+    document.querySelectorAll(".lang-link").forEach((link) => {
+      const next = new URL(link.href);
+      for (const key of ["package", "concept"]) {
+        if (selected.has(key)) next.searchParams.set(key, selected.get(key));
+      }
+      next.hash = "contact-form";
+      link.href = next.href;
+    });
+  }
+  const packageLabels = currentLang === "ka"
+    ? { website: "ვებსაიტის შექმნა — 1,800 GEL-დან", social: "სოციალური მედია — 1,400 GEL/თვეში-დან", growth: "ზრდის პარტნიორობა — 2,800 GEL/თვეში-დან" }
+    : { website: "Website Launch — from 1,800 GEL", social: "Social Presence — from 1,400 GEL/month", growth: "Growth Partnership — from 2,800 GEL/month" };
+  const conceptLabels = { velvet: "Velvet Beauty House", northline: "Northline Dental", metro: "Metro Keys Realty" };
+  const chosenPackage = packageLabels[selected.get("package")];
+  const chosenConcept = conceptLabels[selected.get("concept")];
+  const serviceField = contactForm.querySelector('[name="service"]');
+  const messageField = contactForm.querySelector('[name="message"]');
+  if (chosenPackage && serviceField) {
+    const option = new Option(chosenPackage, chosenPackage, true, true);
+    serviceField.add(option);
+  }
+  if (chosenConcept && messageField && !messageField.value) {
+    messageField.value = currentLang === "ka" ? `მაინტერესებს ${chosenConcept}-ის მსგავსი დიზაინი ჩემი ბიზნესისთვის.` : `I am interested in a design direction like ${chosenConcept} for my business.`;
+  }
+  if (staticHost && submitButton) {
+    submitButton.textContent = currentLang === "ka" ? "შეტყობინების მომზადება" : "Prepare my inquiry";
+    const note = document.createElement("p");
+    note.className = "helper-note";
+    note.textContent = currentLang === "ka" ? "ფორმა მოამზადებს შეტყობინებას. აირჩიეთ WhatsApp ან ელფოსტა და გაგზავნეთ იქიდან." : "This form prepares your message. Choose WhatsApp or email, then send it from that app.";
+    contactForm.insertBefore(note, contactForm.firstChild);
+  }
   const escapeHtml = (value) =>
     value.replace(/[&<>"']/g, (char) => {
       const map = {
@@ -356,10 +392,10 @@ if (contactForms.length) {
       submitting: "Sending...",
       successTitle: "Your request was sent.",
       successText: (name, business) =>
-        `${name}, your details for ${business} were stored securely. We will reply within one business day.`,
-      errorTitle: "The secure form endpoint is not available yet.",
+        `${name}, thank you for telling us about ${business}. We will review your request and get back to you.`,
+      errorTitle: "Your inquiry has not been sent.",
       errorText:
-        "Your message could not be stored from this page right now. Use WhatsApp or email below while the secure form endpoint is being connected.",
+        "We could not confirm delivery. Your message is still here. Open a draft below and send it through WhatsApp or email.",
       whatsappLabel: "Open WhatsApp draft",
       emailLabel: "Open email draft"
     },
@@ -367,10 +403,10 @@ if (contactForms.length) {
       submitting: "იტვირთება...",
       successTitle: "თქვენი მოთხოვნა გაიგზავნა.",
       successText: (name, business) =>
-        `${name}, ${business}-ისთვის გამოგზავნილი დეტალები უსაფრთხოდ შეინახა. ერთ სამუშაო დღეში დაგიკავშირდებით.`,
-      errorTitle: "უსაფრთხო ფორმის მისამართი ჯერ სრულად არ არის დაკავშირებული.",
+        `${name}, გმადლობთ ${business}-ის შესახებ ინფორმაციისთვის. განვიხილავთ მოთხოვნას და დაგიკავშირდებით.`,
+      errorTitle: "თქვენი მოთხოვნა არ გაგზავნილა.",
       errorText:
-        "ამ გვერდიდან თქვენი შეტყობინების შენახვა ახლა ვერ მოხერხდა. სანამ ფორმის საცავი საბოლოოდ დაერთვება, გამოიყენეთ WhatsApp ან email ქვემოთ.",
+        "გაგზავნა ვერ დადასტურდა. თქვენი ტექსტი შენარჩუნებულია. გახსენით მონახაზი ქვემოთ და გაგზავნეთ WhatsApp-ით ან ელფოსტით.",
       whatsappLabel: "გახსენით WhatsApp-ის მონახაზი",
       emailLabel: "გახსენით email-ის მონახაზი"
     }
@@ -391,6 +427,7 @@ if (contactForms.length) {
   const showBanner = (tone, title, message, extraMarkup = "") => {
     if (!successBanner) return;
 
+    successBanner.setAttribute("tabindex", "-1");
     successBanner.classList.add("is-visible");
     successBanner.classList.toggle("is-error", tone === "error");
     successBanner.innerHTML = `
@@ -398,6 +435,8 @@ if (contactForms.length) {
       <p>${escapeHtml(message)}</p>
       ${extraMarkup}
     `;
+    successBanner.focus();
+    successBanner.scrollIntoView({ block: "center", behavior: "auto" });
   };
   const setSubmittingState = (isSubmitting) => {
     if (!submitButton) return;
@@ -488,7 +527,7 @@ if (contactForms.length) {
         language: trimValue(data.get("language")) || currentLang
       };
 
-      if (!payload.name || !payload.contact) {
+      if (!contactForm.reportValidity() || !payload.name || !payload.contact) {
         contactForm.reportValidity();
         return;
       }
@@ -497,11 +536,19 @@ if (contactForms.length) {
         payload.message = payload.service || "General website inquiry";
       }
 
+      if (staticHost) {
+        const links = buildFallbackLinks(payload);
+        showBanner("success", currentLang === "ka" ? "მონახაზი მზადაა — ჯერ არ გაგზავნილა." : "Your draft is ready — it has not been sent.", currentLang === "ka" ? "აირჩიეთ აპი და დააჭირეთ გაგზავნას იქიდან." : "Choose an app below, then press send there.", `<div class="success-actions"><a class="button button-primary" href="${links.whatsappHref}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.whatsappLabel)}</a><a class="button button-secondary" href="${links.emailHref}">${escapeHtml(copy.emailLabel)}</a></div>`);
+        return;
+      }
       setSubmittingState(true);
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 12000);
 
       try {
         const response = await fetch(endpoint, {
           method: "POST",
+          signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json"
@@ -515,7 +562,7 @@ if (contactForms.length) {
           result = await response.json();
         }
 
-        if (!response.ok || (result && result.ok === false)) {
+        if (!response.ok || result?.ok !== true) {
           throw new Error((result && result.error) || `Request failed with status ${response.status}`);
         }
 
@@ -536,57 +583,12 @@ if (contactForms.length) {
           `
         );
       } finally {
+        window.clearTimeout(timeout);
         setSubmittingState(false);
       }
     })();
   });
 }
-
-// --- Custom Ghost Cursor Animation ---
-(function initGhostCursor() {
-  // Only init on non-touch devices to avoid weird mobile behavior
-  if (window.matchMedia("(pointer: coarse)").matches) return;
-
-  const ghost = document.createElement("div");
-  ghost.className = "ghost-cursor";
-  
-  // Custom SVG matching a typical pointer, filled black with white stroke to remain highly visible
-  ghost.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="#000000" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z"/></svg>';
-  
-  document.body.appendChild(ghost);
-
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let ghostX = mouseX;
-  let ghostY = mouseY;
-  
-  let isClicking = false;
-
-  window.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  window.addEventListener("mousedown", () => isClicking = true);
-  window.addEventListener("mouseup", () => isClicking = false);
-
-  function animate() {
-    // Smooth lerp (linear interpolation) following
-    ghostX += (mouseX - ghostX) * 0.15;
-    ghostY += (mouseY - ghostY) * 0.15;
-    
-    // Scale 1.2 normally, 1.45 on click for a satisfying pop animation
-    const scale = isClicking ? 1.45 : 1.2;
-    
-    // Mirrored horizontally: scaleX(-1). This positions it right underneath pointing opposite.
-    ghost.style.transform = `translate3d(${ghostX}px, ${ghostY}px, 0) scaleX(-1) scale(${scale})`;
-    
-    requestAnimationFrame(animate);
-  }
-  
-  // Start the animation loop
-  requestAnimationFrame(animate);
-})();
 
 // --- Dynamic CTA Hover Tracking ---
 (function initDynamicButtons() {

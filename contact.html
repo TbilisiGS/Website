@@ -8,10 +8,11 @@
       name="description"
       content="Contact Tbilisi Growth Studio for website design, social media management, branding visuals, and lead-focused digital support in Tbilisi."
     >
-    <meta name="theme-color" content="#060914">
+    <meta name="theme-color" content="#faf9f6">
     <link rel="icon" href="logo-mark-black.png">
     <link rel="stylesheet" href="styles.css">
-  </head>
+  <link rel="alternate" hreflang="en" href="contact.html"><link rel="alternate" hreflang="ka" href="contact-ka.html">
+</head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
@@ -94,7 +95,7 @@
             <div class="section-heading" style="margin-bottom: 0;">
               <span class="eyebrow">Project form</span>
               <h2>Short form, fast reply.</h2>
-              <p>Tell us enough to understand the business and the main blockage. Your submission goes through our server-side form handler so we can track and reply properly.</p>
+              <p>Tell us about your business, what you need, and what a successful project would look like.</p>
             </div>
 
             <div class="success-banner" id="form-success" data-form-success aria-live="polite"></div>
@@ -114,15 +115,15 @@
             <div class="form-grid">
               <div class="field">
                 <label for="name">Your name</label>
-                <input id="name" name="name" type="text" placeholder="Nino" required>
+                <input id="name" name="name" type="text" autocomplete="name" minlength="2" maxlength="120" placeholder="Nino" required>
               </div>
               <div class="field">
                 <label for="business">Business name</label>
-                <input id="business" name="business" type="text" placeholder="Your business" required>
+                <input id="business" name="business" type="text" autocomplete="organization" minlength="2" maxlength="160" placeholder="Your business" required>
               </div>
               <div class="field">
                 <label for="contact">Phone or email</label>
-                <input id="contact" name="contact" type="text" placeholder="+995..." required>
+                <input id="contact" name="contact" type="text" maxlength="200" placeholder="+995..." required>
               </div>
               <div class="field">
                 <label for="service">Service needed</label>
@@ -140,18 +141,18 @@
 
             <div class="field">
               <label for="message">Short message</label>
-              <textarea id="message" name="message" placeholder="Tell us about your business, your current website or page, and what you want to improve." required></textarea>
+              <textarea id="message" name="message" minlength="5" maxlength="5000" placeholder="Tell us about your business, your current website or page, and what you want to improve." required></textarea>
             </div>
 
             <p class="form-disclaimer">
-              We use the submitted details only to reply, quote, and manage your request. Sensitive keys stay on the server, not in the browser.
+              We use your details to reply, prepare a proposal, and manage your request.
             </p>
 
             <div class="button-group">
               <button class="button button-primary" type="submit">Book Free Audit</button>
               <a class="button button-secondary" href="https://wa.me/995597199500" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>
             </div>
-          </form>
+          <noscript><p class="helper-note">To send an inquiry without JavaScript, please use <a class="text-link" href="mailto:tbilisigrowthstudio@gmail.com">email</a> or <a class="text-link" href="https://wa.me/995597199500">WhatsApp</a>.</p><style>[data-contact-form] button[type="submit"] {display:none}</style></noscript></form>
 
           <div class="contact-aside">
             <article class="contact-card reveal">
@@ -244,7 +245,7 @@
         </div>
         <div class="footer-bottom">
           <span>&copy; <span data-year>2026</span> Tbilisi Growth Studio. All rights reserved.</span>
-          <span>Website design Tbilisi | Social media management Tbilisi | Contact local digital agency</span>
+          <span>Independent creative studio · Tbilisi, Georgia</span>
         </div>
       </div>
     </footer>
