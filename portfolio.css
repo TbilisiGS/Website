@@ -1,0 +1,96 @@
+/* Photographic concept previews. Shared typography and controls live in styles.css. */
+.concept-cover-image { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.concept-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg,#14202099,transparent 60%,#142020b3); pointer-events: none; }
+.concept-cover-title, .concept-cover-label { z-index: 1; }
+.concept-cover:hover .concept-cover-image { transform: scale(1.025); }
+.whatsapp-number { font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.concept-photographic { --accent: #713f49; --accent-strong: #552c35; --concept-rule: #713f4930; background: #faf6f0; }
+.concept-photographic.concept-medical { --accent: #23655e; --accent-strong: #194a45; --concept-rule: #23655e30; background: #f5f8f6; }
+.concept-photographic.concept-property { --accent: #313e36; --accent-strong: #202c25; --concept-rule: #313e3630; background: #f5f3ec; }
+.concept-photographic .container { max-width: 1320px; width: calc(100% - 5rem); }
+.concept-notice { padding-block: .75rem; font-size: .7rem; }
+.concept-header { padding-block: 1.6rem; }
+.concept-brand { display: flex; align-items: center; gap: .75rem; font-size: 1.35rem; }
+.concept-brand-symbol { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--accent); color: var(--accent); font-family: Georgia,serif; font-size: 1.4rem; flex-shrink: 0; }
+.concept-beauty .concept-brand-symbol { border-radius: 50% 50% 0 0; }
+.concept-medical .concept-brand-symbol { border-radius: 10px; font: 500 1.8rem/1 sans-serif; }
+.concept-property .concept-brand-symbol { background: var(--accent); color: #fff; }
+.concept-nav { display: flex; align-items: center; gap: 1.6rem; font-size: .8rem; }
+.concept-nav a:hover { text-decoration: underline; text-underline-offset: .3em; }
+.concept-nav-cta { border-bottom: 1px solid var(--accent); padding-block: .5rem; color: var(--accent); font-weight: 700; }
+.concept-photographic .concept-hero { grid-template-columns: minmax(0,.9fr) minmax(0,1.15fr); gap: 3.5rem; padding-block: 3.5rem 4.5rem; }
+.concept-overline { color: var(--accent); display: block; font-size: .66rem; font-weight: 800; letter-spacing: .16em; line-height: 1.6; text-transform: uppercase; }
+.concept-photographic .concept-hero h1 { font-size: clamp(3rem,5.4vw,5.5rem); letter-spacing: -.045em; line-height: 1.04; }
+.concept-photographic.concept-medical .concept-hero h1 { font-size: clamp(2.6rem,4.5vw,4.5rem); }
+.concept-photographic.concept-property .concept-hero h1 { font-size: clamp(2.7rem,4.8vw,4.8rem); }
+.concept-photographic .concept-hero-copy>p { font-size: .99rem; max-width: 43ch; line-height: 1.85; }
+.concept-photo-hero { margin: 0; min-width: 0; position: relative; }
+.concept-photo-hero img { width: 100%; height: 550px; object-fit: cover; }
+.concept-beauty .concept-photo-hero img { border-radius: 220px 220px 5px 5px; object-position: 51% center; }
+.concept-medical .concept-photo-hero img { border-radius: 16px; object-position: 49% center; }
+.concept-property .concept-photo-hero img { object-position: 53% center; }
+.concept-photo-hero figcaption { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1rem; font-size: .63rem; color: var(--text-muted); letter-spacing: .06em; }
+.concept-hero-note { margin-top: 1.7rem; font-size: .7rem; color: var(--text-muted); display: flex; align-items: center; gap: .7rem; }
+.concept-hero-note>span { font-size: 1.2rem; color: var(--accent); }
+.concept-values { border-block: 1px solid var(--concept-rule); padding-block: 1.4rem; background: #ffffff40; }
+.concept-values .container { display: grid; grid-template-columns: repeat(3,1fr); text-align: center; font-size: .76rem; color: var(--accent); }
+.concept-values span+span { border-left: 1px solid var(--concept-rule); }
+.concept-section-heading { max-width: 750px; margin-block: 1rem 3rem; }
+.concept-section-heading h2 { margin-block: 1rem; font: 500 clamp(2rem,3.8vw,3.5rem)/1.15 Georgia,serif; letter-spacing: -.02em; }
+.concept-medical .concept-section-heading h2, .concept-property .concept-section-heading h2 { font-family: var(--font-body); font-weight: 600; font-size: clamp(2rem,3.2vw,3rem); }
+.concept-section-heading>p { color: var(--text-muted); line-height: 1.8; }
+.concept-photographic .concept-collection { background: transparent; border: 0; padding-bottom: 2rem; }
+.concept-photographic .concept-service { padding: 1.4rem 0 0; border-color: var(--concept-rule); }
+.concept-service h3 { font-size: 1.3rem; line-height: 1.4; }
+.concept-service>p { min-height: 5.2em; font-size: .93rem; }
+.service-number { color: var(--accent) !important; font-size: .7rem; }
+.service-detail { border-block: 1px solid var(--concept-rule); font-size: .85rem; }
+.service-detail summary { cursor: pointer; padding-block: 1rem; color: var(--accent); font-weight: 700; display: flex; justify-content: space-between; gap: 1rem; list-style: none; }
+.service-detail summary::-webkit-details-marker { display: none; }
+.service-detail summary>span { transition: transform .2s ease; }
+.service-detail[open] summary>span { transform: rotate(45deg); }
+.service-detail p { margin-top: 0; line-height: 1.8; }
+.concept-story { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 5rem; }
+.concept-story figure { margin: 0; }
+.concept-story img { width: 100%; aspect-ratio: 1.2; object-fit: cover; border-radius: 4px; }
+.concept-story figcaption { color: var(--text-muted); font-size: .65rem; margin-top: .75rem; }
+.concept-story h2 { font: 500 clamp(2.4rem,3.9vw,4rem)/1.13 Georgia,serif; letter-spacing: -.025em; margin-block: 1.4rem; }
+.concept-medical .concept-story h2 { font-family: var(--font-body); font-size: clamp(2.2rem,3.3vw,3.3rem); font-weight: 600; }
+.concept-story p { color: var(--text-muted); line-height: 1.85; font-size: 1rem; max-width: 43ch; margin-bottom: 2rem; }
+.concept-photographic .concept-inquiry { max-width: none; border-radius: 8px; padding: 3rem 4rem; }
+.concept-photographic .concept-inquiry h2 { max-width: 22ch; font-size: clamp(1.9rem,3.2vw,3rem); line-height: 1.2; }
+.concept-photographic .concept-inquiry .button:hover { background: #fff; }
+.concept-photographic .concept-footer { font-size: .7rem; color: var(--text-muted); }
+html[lang="ka"] .concept-photographic h1, html[lang="ka"] .concept-photographic h2 { font-family: var(--font-georgian-body); line-height: 1.35; }
+html[lang="ka"] .concept-photographic .concept-hero h1 { font-size: clamp(2.3rem,4.3vw,4.2rem); }
+html[lang="ka"] .concept-photographic .concept-section-heading h2, html[lang="ka"] .concept-photographic .concept-story h2 { font-size: clamp(1.9rem,3.1vw,3rem); }
+@media (max-width:1000px) {
+  .concept-photographic .container { width: calc(100% - 3rem); }
+  .concept-photographic .concept-hero { gap: 2rem; }
+  .concept-photo-hero img { height: 480px; }
+  .concept-nav { gap: 1rem; font-size: .7rem; }
+  .concept-brand { font-size: 1.1rem; }
+  .concept-story { gap: 2.5rem; }
+}
+@media (max-width:700px) {
+  .concept-photographic .container { width: calc(100% - 2rem); }
+  .concept-header { flex-wrap: wrap; gap: 1.2rem; }
+  .concept-nav { width: 100%; justify-content: space-between; }
+  .concept-photographic .concept-hero { grid-template-columns: 1fr; padding-block: 2.5rem; gap: 2.5rem; }
+  .concept-photographic .concept-hero h1 { font-size: clamp(2.6rem,10vw,4rem); }
+  .concept-photo-hero img { height: 420px; }
+  .concept-photographic .concept-values { padding-block: 1rem; }
+  .concept-values .container { font-size: .65rem; gap: .6rem; }
+  .concept-values span { padding-inline: .3rem; }
+  .concept-section-heading { margin-bottom: 2rem; }
+  .concept-service>p { min-height: 0; }
+  .concept-story { grid-template-columns: 1fr; gap: 2rem; }
+  .concept-story img { aspect-ratio: 1.25; }
+  .concept-story h2 { font-size: 2.5rem; }
+  .concept-photographic .concept-inquiry { padding: 2rem 1.5rem; }
+  .concept-photo-hero figcaption { font-size: .56rem; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .concept-cover-image, .service-detail summary>span { transition: none; }
+  .concept-cover:hover .concept-cover-image { transform: none; }
+}

@@ -21,7 +21,10 @@ This is a static HTML/CSS/JavaScript site, with no build step. English pages hav
 - `concept-*.html`: standalone concept previews, in both languages.
 - `contact.html`: project inquiry form.
 - `styles.css`: shared presentation and responsive layouts.
+- `portfolio.css`: photographic concept layouts and portfolio cards.
+- `assets/portfolio/`: optimized AI-created imagery for fictional concept brands.
 - `site-config.js`: WhatsApp number and optional promotion popup (disabled).
+- WhatsApp contact is **+995 595 55 14 05** (`995595551405` in links). The existing voice-call number is separate.
 - `script.js`: navigation, portfolio filtering and contact handling.
 
 Serve this directory with a local static server to preview. For example, with Python installed: `python -m http.server 8765 --bind 127.0.0.1`, then open `http://127.0.0.1:8765`.

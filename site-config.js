@@ -1,6 +1,6 @@
 window.TGSiteConfig = {
   contact: {
-    whatsappNumber: "995597199500"
+    whatsappNumber: "995595551405"
   },
   promoPopup: {
     // Bump the version when you want the offer to show again for visitors who previously hid it.

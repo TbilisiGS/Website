@@ -54,7 +54,7 @@ const resolvePromoAction = (action) => {
   if (!action) return null;
 
   if (action.type === "whatsapp") {
-    const whatsappNumber = contactConfig.whatsappNumber || "995597199500";
+    const whatsappNumber = contactConfig.whatsappNumber || "995595551405";
     const message = action.message ? `?text=${encodeURIComponent(action.message)}` : "";
 
     return {
@@ -506,7 +506,7 @@ if (contactForms.length) {
 
     return {
       emailHref: `mailto:tbilisigrowthstudio@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`,
-      whatsappHref: `https://wa.me/995597199500?text=${encodeURIComponent(whatsappText)}`
+      whatsappHref: `https://wa.me/995595551405?text=${encodeURIComponent(whatsappText)}`
     };
   };
 

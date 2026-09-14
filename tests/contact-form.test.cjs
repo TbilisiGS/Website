@@ -33,7 +33,7 @@ async function check(name, response, {staticHost = false, timeout = false, succe
   assert.equal(button.disabled || false,false,name+': button restored');
   if(staticHost){assert.equal(calls,0);assert.match(bannerHtml,/not been sent/)}
   else if(success)assert.match(bannerHtml,/Your request was sent/);
-  else assert.match(bannerHtml,/wa.me\/995597199500\?text=/);
+  else assert.match(bannerHtml,/wa.me\/995595551405\?text=/);
   if(!success) assert.match(bannerHtml,/preview%40example.com/);
   if(query.includes('package=website')) { assert.match(selectedOption.value,/1,800 GEL/); assert.match(languageLink.href,/package=website#contact-form/); }
   if(query.includes('concept=velvet')) { assert.match(message.value,/Velvet Beauty House/); assert.match(languageLink.href,/concept=velvet#contact-form/); }
